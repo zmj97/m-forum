@@ -56,6 +56,8 @@ export default {
     }
   },
 
+  inject: ['reload'],
+
   methods: {
     inputImg (e) {
       this.img = e.target.files[0]
@@ -71,19 +73,25 @@ export default {
       reader.readAsDataURL(this.img)
       reader.onload = e => {
         // 获取图片数据， 保存在e.target.result中
-        this.$http.post('/statics/upload', {0: {'_name': this.img.name, 'miniurl': e.target.result}})
-          .then(res => {
-            this.formItem.avatar = res.data[0][1]
-            this.$http.post('/user/update/info', {'username': this.username, 'formdata': this.formItem})
-              .then(res => {
-                if (res.data === 'success') {
-                  this.$Message.success('修改成功')
-                  this.$router.go(-1)
-                } else {
-                  this.$Message.error('修改失败')
-                }
-              })
-          })
+        this.$http.post('/statics/upload-avatar', {
+          'username': this.username,
+          '_name': this.img.name,
+          'miniurl': e.target.result
+        }).then(res => {
+          this.formItem.avatar = res.data
+          this.$http.post('/user/update/info', {'username': this.username, 'formdata': this.formItem})
+            .then(res => {
+              if (res.data === 'success') {
+                this.$Message.success('修改成功')
+                this.$router.push('/home/user/' + this.username)
+                // 由于保存文件名不变无法刷新头像，待解决
+                location.reload()
+                // this.reload()
+              } else {
+                this.$Message.error('修改失败')
+              }
+            })
+        })
       }
     }
   },

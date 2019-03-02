@@ -27,6 +27,15 @@
         this.$nextTick(function () {
           this.routerIsAlive = true
         })
+
+        // 更新是否有新的通知消息
+        this.$http.post('/user/find/newNt', {
+          'username': this.getCurrentUser().username
+        }).then(res => {
+          if (res.data !== 'error') {
+            this.setNewNt(res.data.newApplyNt || res.data.newResultNt || res.data.newReplyNt)
+          }
+        })
       }
     }
   }

@@ -7,6 +7,25 @@ var bodyParser = require('body-parser')
 router.use(bodyParser.urlencoded({ extended: false }))
 router.use(bodyParser.json())
 
+// 删除成员
+router.post('/member', function (req, res) {
+  db.pull('groups', {'name': req.body.name}, {'users': {$in: req.body.usernames}}, function (err, data) {
+    if (err) {
+      console.error(err)
+      return res.send('error')
+    } else {
+      db.pull('users', {'username': {$in: req.body.usernames}}, {'groups': req.body.name}, function (err, data) {
+        if (err) {
+          console.log(err)
+          return res.send('error')
+        } else {
+          return res.send('success')
+        }
+      })
+    }
+  })
+})
+
 // 删除小组
 router.post('*', function (req, res) {
 

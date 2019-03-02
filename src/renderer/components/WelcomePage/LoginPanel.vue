@@ -52,7 +52,7 @@ export default {
               if (typeof response.data === 'object') {
                 this.$Message.success('登陆成功!')
                 this.$store.dispatch('setStorage', {
-                  email: this.formData.email
+                  username: this.formData.username
                 })
                 this.$store.dispatch('setUser', {
                   data: response.data

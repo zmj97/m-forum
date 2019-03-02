@@ -7,24 +7,71 @@ var bodyParser = require('body-parser')
 router.use(bodyParser.urlencoded({ extended: false }))
 router.use(bodyParser.json())
 
-// 获取所有post
-router.get('/all', function (req, res) {
-  findPosts({}, res)
-})
 
-// 获取指定条件下的所有post
+// 获取指定用户可见的所有post(按页获取)
 router.post('/all', function (req, res) {
-  findPosts(req.body, res)
+  db.find('users', {'username': req.body.username}, function (err, data) {
+    var json = [{'group': undefined}]
+    if (data.length > 0) {
+      data[0].groups.forEach(item => {
+        json.push({'group': item})
+      })
+    }
+    findPosts({$or: json}, req.body.page, res)
+  })
 })
 
 
-function findPosts (json, res) {
-  db.find('posts', json, function (err, data) {
+// 获取指定用户或指定小组内所有发帖（按页获取）
+router.post('/limit', function (req, res) {
+  findPosts(req.body.json, req.body.page, res)
+})
+
+
+// 按照id查找post并返回 , 接受数组
+router.post('/byId', function (req, res) {
+  let ids = req.body._id.map(function(elem) {
+    return require('mongodb').ObjectId(elem)
+  })
+
+  db.find('posts', {'_id': {$in: ids}}, function (err, data) {
     if (err) {
-      console.error('数据库查询错误')
-      return
+      console.error(err)
+      return res.send('error')
+    } else if (data.length === 0) {
+      res.send('empty')
     } else {
-      return res.send(data)
+      res.send(data)
+    }
+  })
+})
+
+// 按照关键词搜索帖子
+router.post('/search', function (req, res) {
+  db.searchPosts(req.body.searchStr, function (err, data) {
+    if (err) {
+      console.log(err)
+      res.send('error')
+    } else {
+      res.send(data)
+    }
+  })
+})
+
+function findPosts (json, page, res) {
+  db.findPosts(json, page, function (err, data) {
+    if (err) {
+      console.error('数据库查询帖子错误')
+      return res.send('error')
+    } else {
+      db.getPostsCount(json, function (err, count) {
+        if (err) {
+          console.error('数据库查询帖子总数错误')
+          return res.send('error')
+        } else {
+          return res.send({'data': data, 'count': count})
+        }
+      })
     }
   })
 }

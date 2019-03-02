@@ -39,7 +39,7 @@ export default {
 #panel {
   position: relative;
   height: 100vh;
-  overflow: hidden;
+  // overflow: hidden;
 }
 /*
  * -- 平板及以上设备 --

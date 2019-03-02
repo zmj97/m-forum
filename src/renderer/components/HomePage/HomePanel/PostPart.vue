@@ -1,67 +1,109 @@
 <template>
-  <div>
+  <div v-if="postDataFinal" style="overflow: auto">
     <div id="detail">
       <!-- 有头像时显示头像，无头像时显示字符头像 -->
       <m-avatar
        :avatar="avatar"
        :size=3
       ></m-avatar>
-
+      <!-- 相关信息 -->
       <div class="info">
-        <span class="username info-left">{{ postData.username }}</span>
-        <span class="info-right">编辑于{{ postData.time | timeFilter }}</span>
+        <!-- 用户名 -->
+        <span class="username info-left">{{ postDataFinal.username }}</span>
+        <!-- 发表时间 -->
+        <span class="info-right">编辑于{{ postDataFinal.time | timeFilter }}</span>
         <br /> 
-
+        <!-- 回复数量 -->
         <span class="info-right">回复 {{ replysCount }}</span>
       </div>
     </div>
 
-    <h1 id="header">{{ postData.title }}</h1>
+    <!-- 标题 -->
+    <h1 id="header">{{ postDataFinal.title }}</h1>
     <div style="text-align: center">
-      <div v-if="postData.abstract">
-        {{ postData.abstract }}
+      <!-- 摘要 -->
+      <div v-if="postDataFinal.abstract">
+        {{ postDataFinal.abstract }}
       </div>
-      <router-link v-if="postData.group" :to="'/home/group/' + postData.group">
-        <Tag color="success" class="group">{{ postData.group }}</Tag>
+      <!-- 小组 -->
+      <router-link v-if="postDataFinal.group" :to="'/home/group/' + postDataFinal.group">
+        <Tag color="success" class="group">{{ postDataFinal.group }}</Tag>
         <br />
       </router-link>
-      <div v-if="postData.tags.length > 0">
-        <Tag color="blue" v-for="item in postData.tags" style="margin: 5px">
+      <!-- 标签 -->
+      <div v-if="postDataFinal.tags.length > 0">
+        <Tag color="blue" v-for="item in postDataFinal.tags" style="margin: 5px">
           {{ item }}
         </Tag>
       </div>
     </div>
 
+    <!-- 帖子内容 -->
     <article id="content" v-html="convertedContent">
     </article>
-    <section v-if="postData.replys.length > 0" id="replys">
+
+    <!-- 帖子回复 -->
+    <section v-if="postDataFinal.replys.length > 0" id="replys">
       <!-- 数据在前，index在后 -->
       <reply-item
-       v-for="(replyItem, index) in postData.replys"
+       v-for="(replyItem, index) in postDataFinal.replys"
        :replyData="replyItem"
        :index="index"
+       :id="'reply-'+index"
+       :postId="postDataFinal._id"
+       :title="postDataFinal.title"
       ></reply-item>
     </section>
+    <!-- 没有回复时提示 -->
     <p v-else class="no-reply">快来当第一个回复的人吧！</p>
 
+    <!-- 添加回复 -->
     <section id="new-reply">
-      <new-reply :_id="postData._id"></new-reply>
+      <!-- 传递帖子id、标题和帖子的发帖人 -->
+      <new-reply 
+       :_id="postDataFinal._id" 
+       :title="postDataFinal.title"
+       :username="postDataFinal.username"
+      ></new-reply>
     </section>
 
-    <Dropdown placement="top-end" trigger="click" id="drop-menu">
-      <a href="javascript:void(0)">
-        <Icon type="ios-menu" id="drop-menu-icon"></Icon>
-      </a>
-      <DropdownMenu slot="list">
-        <DropdownItem>收藏</DropdownItem>
-        <DropdownItem>回复</DropdownItem>
-        <DropdownItem style="color: red" v-if="currentUser === postData.username" @click.native="modalDelete = true">删除</DropdownItem>
-        <DropdownItem>
-          <a href="#detail">返回顶部</a>
-        </DropdownItem>
-      </DropdownMenu>
-    </Dropdown>
+    <!-- 功能键 -->
+    <transition name="fade">
+      <div v-if="showFixMenu" id="fix-menu">
+        <!-- 回到顶部 -->
+        <Tooltip content="回到顶部">
+          <a href="#detail">
+            <Icon type="ios-arrow-up" />
+          </a>
+        </Tooltip>
 
+        <!-- 收藏 -->
+        <!-- 如果已收藏，显示实心星星 -->
+        <Tooltip v-if="stared" content="取消收藏">
+          <!-- 点击取消收藏 -->
+          <Icon @click="unstarPost" type="md-star" style="cursor: pointer" />
+        </Tooltip>
+        <!-- 如果未收藏，显示空心星星 -->
+        <Tooltip v-else content="收藏">
+          <!-- 点击收藏 -->
+          <Icon @click="starPost" type="md-star-outline" style="cursor: pointer" />
+        </Tooltip>
+
+        <!-- 回复 -->
+        <Tooltip content="回复">
+          <a href="#new-reply">
+            <Icon type="ios-text" />
+          </a>
+        </Tooltip>
+
+        <!-- 返回前一页 -->
+        <Tooltip v-if="showBack" content="返回">
+          <Icon @click="goBack" type="md-arrow-back" style="cursor: pointer" />
+        </Tooltip>
+      </div>
+    </transition>
+
+    <!-- 确认删除帖子的弹窗 -->
     <Modal
       v-model="modalDelete"
       title="删除帖子"
@@ -85,26 +127,41 @@ export default {
     'postData'
   ],
 
+  // 用于无闪烁刷新
   inject: [
     'reload'
   ],
 
   data () {
     return {
+      // 帖子发表者的头像
       avatar: null,
+      // 当前用户
       currentUser: this.$store.state.Users.currentUser.username,
-
-      modalDelete: false
+      // 删除帖子的弹窗是否显示
+      modalDelete: false,
+      // 最终用于显示的帖子数据
+      postDataFinal: this.postData,
+      // 是否显示固定菜单按钮
+      showFixMenu: true,
+      // 当前用户是否收藏了这个帖子
+      stared: false,
+      // 当前用户收藏的所有帖子id
+      stars: [],
+      // 是否显示返回按钮，在全屏显示时显示
+      showBack: false
     }
   },
 
   filters: {
     // 将时间转换为当地时间显示
+    // 当前时间的前一天和前两天用昨天和前天显示
     timeFilter (value) {
       var date = new Date(value)
-      if (date.getDay() === new Date().getDay()) {
+      var currentDate = new Date()
+      if (date.getDate() === currentDate.getDate() && date.getMonth() === currentDate.getMonth() && date.getYear() === currentDate.getYear()) {
         return '今天' + date.toLocaleString().split(' ')[1]
-      } else if (date.getDay() + 1 === new Date().getDay()) {
+      } else if (date.getDate() + 1 === currentDate.getDate() && date.getMonth() === currentDate.getMonth() && date.getYear() === currentDate.getYear()) {
         return '昨天' + date.toLocaleString().split(' ')[1]
       }
       return date.toLocaleString()
@@ -117,24 +174,86 @@ export default {
   },
 
   computed: {
+    // 回复数量
     replysCount () {
-      return this.postData.replys.length
+      return this.postDataFinal.replys.length
     },
 
+    // 将content转换为对应的markdown显示
     convertedContent () {
-      return mavonEditor.getMarkdownIt().render(this.postData.content)
+      return mavonEditor.getMarkdownIt().render(this.postDataFinal.content)
     }
   },
 
   methods: {
+    // 获取发布人的头像
     getAvatar () {
-      this.getUserData(this.postData.username, data => {
+      this.getUserData(this.postDataFinal.username, data => {
         this.avatar = data.avatar
       })
     },
 
+    // 获取当前用户所有收藏的帖子
+    getStars () {
+      this.$http.post('/user/find/stars', {
+        'username': this.currentUser
+      }).then(res => {
+        if (res.data === 'error') {
+          this.$Message.error('数据库连接失败')
+        } else {
+          this.stars = res.data.stars.map(item => item.id)
+          // 更新当前帖子是否被收藏
+          this.stared = this.stars.includes(this.postDataFinal._id)
+        }
+      }).catch(err => {
+        console.error(err)
+        this.$Message.error('网络连接错误！')
+      })
+    },
+
+    // 收藏帖子
+    starPost () {
+      this.$http.post('/user/create/star', {
+        'username': this.currentUser,
+        'id': this.postDataFinal._id,
+        'title': this.postDataFinal.title,
+        'abstract': this.postDataFinal.abstract ? this.postDataFinal.abstract : (this.postDataFinal.content.length > 100 ? this.postDataFinal.content.slice(0, 100) + '...' : this.postDataFinal.content)
+      }).then(res => {
+        if (res.data === 'success') {
+          this.$Message.success('收藏成功')
+          // 无闪烁刷新
+          this.getStars()
+        } else {
+          this.$Message.error('收藏失败')
+        }
+      }).catch(err => {
+        console.error(err)
+        this.$Message.error('网络连接错误！')
+      })
+    },
+
+    // 取消收藏帖子
+    unstarPost () {
+      this.$http.post('/user/delete/star', {
+        'username': this.currentUser,
+        'id': this.postDataFinal._id
+      }).then(res => {
+        if (res.data === 'success') {
+          this.$Message.success('取消收藏成功')
+          // 无闪烁刷新
+          this.getStars()
+        } else {
+          this.$Message.error('取消收藏失败')
+        }
+      }).catch(err => {
+        console.error(err)
+        this.$Message.error('网络连接错误！')
+      })
+    },
+
+    // 确认删除帖子
     okDelete () {
-      this.$http.post('/post/delete', {'_id': this.postData._id})
+      this.$http.post('/post/delete', {'_id': this.postDataFinal._id})
         .then(res => {
           if (res.data === 'success') {
             this.$Message.success('删除成功')
@@ -144,11 +263,101 @@ export default {
             this.$Message.error('删除失败')
           }
         })
+    },
+
+    // 返回上一页
+    goBack () {
+      this.$router.back(-1)
+    },
+
+    // 利用query传入的帖子id可能不存在
+    postNotExist () {
+      this.$Message.error('该帖子不存在！')
+      this.$router.push('/home')
+    },
+
+    // 确保在低宽度中固定菜单在帖子列表中不显示
+    scrollListener () {
+      if (document.body.clientWidth > 768) return
+      let postPosition = (document.documentElement.scrollTop || document.body.scrollTop) - document.getElementById('list').scrollHeight + 300
+      if (this.showFixMenu && postPosition < 0) {
+        this.showFixMenu = false
+      } else if (!this.showFixMenu && postPosition > 0) {
+        this.showFixMenu = true
+      }
+    },
+    resizeListener () {
+      if (document.body.clientWidth > 768) {
+        this.showFixMenu = true
+      } else {
+        this.showFixMenu = false
+      }
+    }
+  },
+
+  watch: {
+    postData () {
+      // 当帖子数据改变时需要重新获取发帖人头像
+      // 并更新用户是否收藏了这个帖子
+      setTimeout(() => { this.getAvatar() })
+      if (this.$route.query.postId === undefined) {
+        this.postDataFinal = this.postData
+      }
+      // 更新当前帖子是否被收藏
+      this.stared = this.stars.includes(this.postDataFinal._id)
     }
   },
 
   mounted () {
-    this.getAvatar()
+    if (this.postDataFinal === undefined && this.$route.query.postId === undefined) {
+      // 帖子不存在
+      this.postNotExist()
+    } else if (this.$route.query.postId !== undefined) {
+      // 利用query传递帖子id
+      this.showBack = true
+      this.$http.post('/post/find/byId', {'_id': [this.$route.query.postId]})
+        .then(res => {
+          if (res.data === 'empty') {
+            this.postNotExist()
+          } else if (res.data === 'error') {
+            this.$Message.error('数据库连接错误!')
+            this.$router.push('/home')
+          } else {
+            this.postDataFinal = res.data[0]
+            this.getAvatar()
+            if (!this.$route.query.replyIndex) return
+            // scroll到query传入的回复楼层并闪烁提示
+            setTimeout(() => {
+              var replyId = 'reply-' + this.$route.query.replyIndex
+              window.location.hash = '#' + replyId
+              // 闪烁提示五次
+              this.hintReply(replyId, 5)
+            }, 0)
+          }
+        })
+        .catch(err => {
+          console.error(err)
+          this.$Message.error('网络连接错误！')
+          this.$router.push('/home')
+        })
+    } else {
+      // 利用props传递帖子数据
+      this.getAvatar()
+    }
+
+    // 获取所有收藏的帖子id
+    setTimeout(() => { this.getStars() }, 0)
+
+    // 添加滚动和改变大小的监听，
+    // 保证窄屏时固定按钮不会在帖子列表中显示
+    window.addEventListener('scroll', this.scrollListener, false)
+    window.addEventListener('resize', this.resizeListener, false)
+  },
+
+  destroyed () {
+    // 销毁时移除监听器
+    window.removeEventListener('scroll', this.scrollListener, false)
+    window.removeEventListener('resize', this.resizeListener, false)
   }
 }
 </script>
@@ -161,21 +370,20 @@ export default {
   margin: 0;
 }
 
-#drop-menu {
+// 固定功能键
+#fix-menu {
   position: fixed;
-  bottom: 2rem;
-  right: 2rem;
+  width: 25px;
+  top: 50%;
+  right: 1rem;
   font-size: 1.5rem;
+  color: #19be6b;
   z-index: 1999;
 
-  #drop-menu-icon {
-    padding: 6px;
-    background-color: white;
-    border-radius: 18px;
-    box-shadow: 0 0 4px black;
-  }
+  a {color: #19be6b;}
 }
 
+// 帖子信息
 #detail {
   position: relative;
   font-size: 0.8rem;
@@ -203,15 +411,18 @@ export default {
   }
 }
 
+// 帖子标题
 #header {
   margin-top: @paddingNum;
   text-align: center;
 }
 
+// 新的回复
 #new-reply {
   background-color: #eee;
 }
 
+// 没有回复时的提示样式
 .no-reply {
   border-top: 2px dotted #bbb;
   padding: 3rem 0;
@@ -219,6 +430,7 @@ export default {
   text-align: center;
 }
 
+// 平板
 @media screen and (max-width: 60rem) {
   #header {
     top: 260px;
@@ -230,6 +442,7 @@ export default {
   }
 }
 
+// 手机
 @media screen and (max-width: 40rem) {
   // 手机屏幕中header不为fix，因此去掉top的高度
   #top {
@@ -245,4 +458,7 @@ export default {
     margin-top: 0;
   }
 }
+
+.fade-enter-active, .fade-leave-active {transition: opacity .2s;}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {opacity: 0;}
 </style>

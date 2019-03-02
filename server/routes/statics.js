@@ -3,6 +3,7 @@ var router = express.Router()
 var bodyParser = require('body-parser')
 var fs = require('fs')
 var path = require('path')
+var md5 = require('md5-node')
 // 获取mime类型
 var mimeModel = require('../modules/mimeModel.js')
 var staticPath = __dirname + '/../public/'
@@ -10,7 +11,6 @@ var staticPath = __dirname + '/../public/'
 // 设置body-parser中间件
 router.use(bodyParser.json({limit: '50mb'}))
 router.use(bodyParser.urlencoded({limit: '50mb', extended: true}))
-// router.use(bodyParser.urlencoded({ extended: false }))
 router.use(bodyParser.json())
 
 router.get('*', function (req, res) {
@@ -48,6 +48,24 @@ router.post('/upload', function (req, res) {
     })
   }
   return res.send(resData)
+})
+
+router.post('/upload-avatar', function (req, res) {
+  // 保存图片
+  // 返回url
+  // 中文名显示异常，改为md5
+  if (req.body.username) {
+    var filename = 'user-' + md5(req.body.username) + path.extname(req.body._name)
+  } else {
+    var filename = 'group-' + md5(req.body.name) + path.extname(req.body._name)
+  }
+  var imgBuffer = new Buffer(req.body.miniurl.replace(/^data:image\/\w+;base64,/, ""), 'base64')
+  fs.writeFile(staticPath + filename, imgBuffer, (err) => {
+    if (err) {
+      return res.send(err)
+    }
+  })
+  return res.send(url + filename)
 })
 
 module.exports = router

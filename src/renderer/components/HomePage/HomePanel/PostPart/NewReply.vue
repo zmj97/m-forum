@@ -23,7 +23,7 @@ export default {
 
   name: 'NewReply',
 
-  props: ['_id'],
+  props: ['_id', 'username', 'title'],
 
   inject: [
     'reload'
@@ -100,11 +100,17 @@ export default {
             this.$refs.md.$img2Url(img[0], img[1])
           })
           this.$http.post('/post/create/reply', {
+            // 帖子id
             '_id': this._id,
+            'title': this.title,
+            // 帖子的发帖人
+            'username': this.username,
+            // 回复的数据
             'reply': {
               'username': this.$store.state.Users.currentUser.username,
               'time': new Date(),
-              'content': this.value
+              'content': this.value,
+              'replys': []
             }
           }).then(res => {
             if (res.data === 'success') {

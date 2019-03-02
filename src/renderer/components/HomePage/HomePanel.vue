@@ -1,12 +1,15 @@
 <template>
-  <div id="home-panel" v-show="posts.length > 0">
-    <section id="list">
+  <div id="home-panel" v-if="posts.length > 0">
+    <section id="list" @click="jumpToPost">
       <list-item
        v-for="(item, index) in posts"
        :itemData="item"
        :selected="selected[index]"
        @click.native="updateSelected(index)"
       ></list-item>
+
+      <!-- 分页 选择页数 每页显示20条 -->
+      <Page v-if="postsCount > 20" :total="postsCount" :page-size="20" simple class="pageSelector" @on-change="getPosts" />
     </section>
     <article id="main">
       <post-part v-if="posts.length > 0" :postData="posts[selectedPos]"></post-part>
@@ -30,17 +33,24 @@ export default {
   data () {
     return {
       posts: [],
+      postsCount: 0,
       selectedPos: 0,
       selected: [true]
     }
   },
 
   methods: {
-    getPosts () {
+    getPosts (page) {
+      // 返回帖子列表顶部
+      setTimeout(() => {
+        document.documentElement.scrollTop = 0
+      }, 0)
+
       // 获取帖子数据
-      this.$http.get('/post/find/all')
+      this.$http.post('/post/find/all', {'username': this.$store.state.Users.currentUser.username, 'page': page})
         .then(res => {
-          this.posts = res.data.reverse()
+          this.$set(this, 'posts', res.data.data)
+          this.$set(this, 'postsCount', res.data.count)
           // 当没有帖子时提示
           if (this.posts.length === 0) {
             this.$Notice.open({
@@ -49,6 +59,7 @@ export default {
             return
           }
           // 更新选中数组selected
+          this.selected[0] = true
           for (var i = 1; i < this.posts.length; i++) {
             this.selected[i] = false
           }
@@ -64,11 +75,17 @@ export default {
       this.$set(this.selected, this.selectedPos, false)
       this.$set(this.selected, pos, true)
       this.$set(this, 'selectedPos', pos)
+    },
+
+    jumpToPost () {
+      if (document.body.clientWidth > 768) return
+      let listHeight = document.getElementById('list').scrollHeight
+      document.documentElement.scrollTop = listHeight
     }
   },
 
   mounted () {
-    this.getPosts()
+    this.getPosts(1)
   }
 }
 </script>
@@ -78,6 +95,7 @@ export default {
 @navHeight: 60px;
 @listWidth: 300px;
 
+/* 手机中上方list 下方 main */
 #home-panel, #list {
   margin: 0;
   padding: 0;
@@ -89,7 +107,10 @@ export default {
   // letter-spacing: 1px;
 }
 
-/* 手机中上方list 下方 main */
+.pageSelector {
+  margin: @gapWidth 0;
+  text-align: center;
+}
 
 
 /*

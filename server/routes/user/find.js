@@ -32,30 +32,93 @@ router.post('/data', function (req, res) {
     })
   } else {
     // 如果查询一个用户
-    db.find('users', req.body, function (err, data) {
-      if (err) {
-        console.error('数据库查询错误')
-        return res.send()
-      } else if (data.length > 0) {
-        return res.send(data[0])
-      } else {
-        return res.send('false') 
-      }
-    })
+    findUser(req.body, res)
+    // db.find('users', req.body, function (err, data) {
+    //   if (err) {
+    //     console.error('数据库查询错误')
+    //     return res.send()
+    //   } else if (data.length > 0) {
+    //     return res.send(data[0])
+    //   } else {
+    //     return res.send('false') 
+    //   }
+    // })
   }
 })
 
-// function findUser(json, res) {
-//   db.find('users', json, function (err, data) {
-//     if (err) {
-//       console.error('数据库查询错误')
-//       return res.send()
-//     } else if (data.length > 0) {
-//       return res.send(data[0])
-//     } else {
-//       return res.send('false') 
-//     }
-//   })
-// }
+// 获取指定用户加入的所有小组的名字
+router.post('/groups-names', function (req, res) {
+  db.find('users', [req.body, {'groups': 1}], function (err, data) {
+    if (err) {
+      console.log(err)
+      return res.send('error')
+    } else {
+      return res.send(data)
+    }
+  })
+})
+
+// 获取指定用户的所有通知
+router.post('/notifications', function (req, res) {
+  db.find('users', [req.body, {
+    'applyNotifications': 1, 
+    'resultNotifications': 1, 
+    'replyNotifications': 1,
+    'newApplyNt': 1, 
+    'newResultNt': 1, 
+    'newReplyNt': 1
+  }], function (err, data) {
+    if (err) {
+      console.log(err)
+      return res.send('error')
+    } else {
+      return res.send(data[0])
+    }
+  })
+})
+
+
+// 获取指定用户是否有新的通知
+router.post('/newNt', function (req, res) {
+  db.find('users', [req.body, {
+    'newApplyNt': 1, 
+    'newResultNt': 1, 
+    'newReplyNt': 1
+  }], function (err, data) {
+    if (err) {
+      console.log(err)
+      return res.send('error')
+    } else {
+      return res.send(data[0])
+    }
+  })
+})
+
+// 获取指定用户的收藏
+router.post('/stars', function (req, res) {
+  db.find('users', [req.body, {
+    'stars': 1
+  }], function (err, data) {
+    if (err) {
+      console.log(err)
+      return res.send('error')
+    } else {
+      return res.send(data[0])
+    }
+  })
+})
+
+function findUser(json, res) {
+  db.find('users', json, function (err, data) {
+    if (err) {
+      console.error('数据库查询用户错误')
+      return res.send()
+    } else if (data.length > 0) {
+      return res.send(data[0])
+    } else {
+      return res.send('false') 
+    }
+  })
+}
 
 module.exports = router

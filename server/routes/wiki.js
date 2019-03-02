@@ -2,10 +2,10 @@ var express = require('express')
 var router = express.Router()
 
 // 引入模块
-var create = require('./user/create.js')
-var update = require('./user/update.js')
-var find = require('./user/find.js')
-var del = require('./user/delete.js')
+var create = require('./wiki/create.js')
+var update = require('./wiki/update.js')
+var find = require('./wiki/find.js')
+var del = require('./wiki/delete.js')
 
 /*
 - create

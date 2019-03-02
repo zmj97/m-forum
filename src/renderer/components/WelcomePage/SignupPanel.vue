@@ -34,7 +34,6 @@ export default {
   data () {
     const pwdRepeatValidator = (rule, value, callback) => {
       if (value !== this.formData.password) {
-        console.log(value)
         callback(new Error('重复密码与密码不同'))
       } else {
         callback()
@@ -97,7 +96,13 @@ export default {
             telephone: null,
             groups: [],
             stars: [],
-            drafts: []
+            drafts: [],
+            applyNotifications: [],
+            resultNotifications: [],
+            replyNotifications: [],
+            newApplyNt: false,
+            newResultNt: false,
+            newReplyNt: false
           }
           this.$http.post('/user/create/signup', data)
             .then((response) => {
@@ -119,7 +124,7 @@ export default {
             })
             .catch((err) => {
               this.$Message.error('网络连接失败!')
-              console.error(err)
+              console.log(err)
             })
         } else {
           this.$Message.error('请检查输入!')

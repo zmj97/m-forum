@@ -11,10 +11,12 @@ app.all('*', function(req, res, next) {
 
 var user = require('./routes/user.js')
 var post = require('./routes/post.js')
+var wiki = require('./routes/wiki.js')
 var group = require('./routes/group.js')
 var statics = require('./routes/statics.js')
 app.use('/user', user)
 app.use('/post', post)
+app.use('/wiki', wiki)
 app.use('/group', group)
 app.use('/statics', statics)
 

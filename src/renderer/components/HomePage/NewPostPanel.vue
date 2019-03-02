@@ -141,20 +141,13 @@ export default {
       }
     },
 
-    getJoinedGroups () {
-      this.getUserData(this.postData.username, data => {
-        data.groups.forEach(item => {
-          this.joinedGroups.push(item)
-        })
-      })
-    },
-
     okPost () {
       if (this.postData.title.replace(/\s+/g, '').length === 0) {
         return this.$Message.error('标题内容不能为空！')
       }
       // 设置时间
       this.postData.time = new Date()
+      this.postData.lastModifyTime = this.postData.time
       // 如果设定了小组
       if (this.group) {
         this.postData.group = this.group
@@ -185,7 +178,7 @@ export default {
   },
 
   created () {
-    this.getJoinedGroups()
+    this.getJoinedGroups(this.postData.username, this.joinedGroups)
   }
 }
 </script>
@@ -193,6 +186,10 @@ export default {
 <style lang="css" scoped>
 #title, #abstract, #tags, #buttons, #editor {
   margin-top: 0.5rem;
+}
+
+#editor {
+  z-index: 1000;
 }
 
 .float-right {

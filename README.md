@@ -27,6 +27,8 @@ npm run lint
 This project was generated with [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[8fae476](https://github.com/SimulatedGREG/electron-vue/tree/8fae4763e9d225d3691b627e83b9e09b56f6c935) using [vue-cli](https://github.com/vuejs/vue-cli). Documentation about the original structure can be found [here](https://simulatedgreg.gitbooks.io/electron-vue/content/index.html).
 
 
+[webhook push event](https://developer.github.com/v3/activity/events/types/#webhook-event-name-34)
+
 
 ## 路由
 
@@ -60,21 +62,21 @@ This project was generated with [electron-vue](https://github.com/SimulatedGREG/
   - find
   - delete
 - post
-  - normal
-    - create
-    - update
-    - find
-    - delete
-  - private
-    - create
-    - update
-    - find
-    - delete
-  - group
-    - create
-    - update
-    - find
-    - delete
+  - create
+    - reply/reply
+      - _id
+      - title
+      - username
+      - replyIndex(评论的楼数0,1,2....)
+      - reply
+  - update
+  - find
+  - delete
+- group
+  - create
+  - update
+  - find
+  - delete
 - wiki(?)
 
 
@@ -98,15 +100,24 @@ This project was generated with [electron-vue](https://github.com/SimulatedGREG/
 - telephone(default: null)
 - groups(name)(default: [])
 - stars(id, 收藏的帖子)(default: [])
-- drafts(草稿)(default: [])
+  - id
   - title
-  - abstract
-  - tags(name)
-  - time
-  - content
-  - group(name)
-  - users(username)
-
+  - abstract(帖子的abstract，没有则为帖子内容的前100个字符+'...')
+- applyNotifications(别人申请此人管理的小组的申请)
+  - username
+  - groupName
+- resultNotifications(申请小组的结果)
+  - groupName
+  - result(true or false)
+- replyNotifications(回复通知)
+  - username
+  - title
+  - postId(由于帖子名称可重复， 因此额外存储帖子id)
+  - replyIndex(0, 1, ...., 用于跳转)
+- newApplyNt(true or false)
+- newResultNt(true or false)
+- newReplyNt(true or false)
+  
 
 
 ### groups
@@ -114,15 +125,16 @@ This project was generated with [electron-vue](https://github.com/SimulatedGREG/
 存储所有小组，对于每一个小组，都有以下属性：
 
 - name
+- avatar(null)
 - leader(username)
 - intro
 - users(username)
-
+- joinPubic(开放加入, true or false)
 
 
 ### posts
 
-存储所有公共帖子，对于每一个帖子，都有以下属性：
+存储所有帖子，对于每一个帖子，都有以下属性：
 
 - username
 - title
@@ -131,10 +143,15 @@ This project was generated with [electron-vue](https://github.com/SimulatedGREG/
 - tags(name)
 - time
 - content
+- lastModifyTime(创建后为发表时间，每次有新评论时，更新为新评论)
 - replys (存储这个帖子所有回复)
   - username
   - time
   - content
+  - replys
+    - username
+    - time
+    - content
 
 
 
@@ -156,14 +173,24 @@ This project was generated with [electron-vue](https://github.com/SimulatedGREG/
 
 ### wikis
 
-?
+- title
+- lastestVersion
+  - username
+  - time
+  - content
+  - editMessage
+- allVersions([])
+  - username
+  - time
+  - content
+  - editMessage
+- groups(默认为[]，设定后为只限这些小组的成员可见与编辑的wiki)
 
 
 
 ## 静态资源
 
 /public
-
 
 
 ## 测试

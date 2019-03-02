@@ -7,6 +7,43 @@ var bodyParser = require('body-parser')
 router.use(bodyParser.urlencoded({ extended: false }))
 router.use(bodyParser.json())
 
+// 组长添加新成员
+router.post('/member', function (req, res) {
+  addMember(req, res)
+})
+
+// 用户申请加入小组
+router.post('/join', function (req, res) {
+  db.find('groups', {'name': req.body.name}, function (err, data) {
+    if (err) {
+      console.error(err)
+      return res.send('error')
+    } else if (data.length === 0) {
+      // 小组不存在
+      return res.send('not-exist')
+    } else if (data[0].joinPublic) {
+      // 如果小组开放加入
+      addMember(req, res)
+    } else {
+      // 如果小组未开放加入，需要申请经过组长同意
+      db.push('users', {'username': req.body.leader}, {'applyNotifications': {
+        'username': req.body.username,
+        'groupName': req.body.name
+      }}, function (err, data) {
+        if (err) {
+          console.error(err)
+          return res.send('error')
+        } else {
+          db.update('users', {'username': req.body.leader}, {
+            'newApplyNt': true,
+          }, () => {})
+          res.send('applied')
+        }
+      })
+    }
+  })
+})
+
 // 创建小组
 router.post('*', function (req, res) {
 
@@ -40,7 +77,24 @@ router.post('*', function (req, res) {
       }
     })
   })
-
 })
+
+function addMember (req, res) {
+  db.push('groups', {'name': req.body.name}, {'users': req.body.username}, function (err, data) {
+    if (err) {
+      console.error(err)
+      return res.send('error')
+    } else {
+      db.push('users', {'username': req.body.username}, {'groups': req.body.name}, function (err, data) {
+        if (err) {
+          console.log(err)
+          return res.send('error')
+        } else {
+          return res.send('success')
+        }
+      })
+    }
+  })
+}
 
 module.exports = router

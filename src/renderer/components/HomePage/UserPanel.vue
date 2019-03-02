@@ -2,21 +2,22 @@
   <!-- 左中右分别为用户信息、所加入小组　和　所发帖子 -->
   <div style="overflow: auto">
     <!-- 用户信息 -->
-    <Col span="6" class="info-side">
+    <Col :xs="24" :sm="6" class="info-side">
       <m-avatar
        :avatar="userData.avatar"
        :size=3
        class="user-avatar"
       ></m-avatar>
       <div class="modifyButton">
-        <Button v-if="currentUser === userData.username" @click.native="$router.push('/home/edit')">编辑</Button>
+        <!-- 编辑用户信息 只有当前用户的用户页显示编辑按钮 -->
+        <Button v-if="currentUser === username" @click.native="$router.push('/home/edit')">编辑</Button>
       </div>
       <h1>
         {{ username }}
         <Icon v-if="userData.gender === 'female'" type="ios-female" style="color: pink; font-weight: bold" />
         <Icon v-else-if="userData.gender === 'male'" type="ios-male" style="color: blue; font-weight: bold" />
       </h1>
-      <div>
+      <div v-if="userData.email">
         <Icon type="ios-mail"></Icon>
         {{ userData.email }}
       </div>
@@ -27,9 +28,9 @@
     </Col>
 
     <!-- 用户加入的小组 -->
-    <Col span="8" offset="1">
+    <Col :xs="{ span: 24}" :sm="{ span: 6, offset: 2 }">
       <Icon type="ios-people" size="30" style="margin: 10px"></Icon>所在小组
-      <div v-if="groups.length > 0">
+      <div v-show="groups.length > 0">
         <div v-for="item in groups">
           <router-link :to="'/home/group/' + item.name">
             <Card class="card-margin">
@@ -40,13 +41,13 @@
           </router-link>
         </div>
       </div>
-      <div v-else>
+      <div v-if="groups.length === 0">
         该用户暂未加入小组！
       </div>
     </Col>
 
     <!-- 用户发过的帖子 -->
-    <Col span="8">
+    <Col :xs="24" :sm="{ span: 6, offset: 2 }">
       <Icon type="ios-paper" size="25" style="margin: 10px"></Icon>所有帖子
       <div v-if="posts.length > 0">
         <list-item
@@ -55,6 +56,9 @@
          @click.native="showPostMethod(index)"
          class="card-margin"
         ></list-item>
+
+        <!-- 分页 选择页数 每页显示20条 -->
+        <Page v-if="postsCount > 20" :total="postsCount" :page-size="20" simple class="pageSelector" @on-change="updateData" />
       </div>
       <div v-else style="margin-top: 5px">
         该用户还没有发过帖子！
@@ -88,6 +92,9 @@ export default {
       groups: [],
       posts: [],
 
+      // 所有帖子数
+      postsCount: 0,
+
       showPost: false,
       postPos: 0
     }
@@ -95,21 +102,7 @@ export default {
 
   computed: {
     username () {
-      var tmpUsername = this.$route.params.name
-
-      this.getUserData(tmpUsername, data => {
-        this.userData = data
-        // 获取小组数据
-        this.getGroupData(data.groups, groupsData => {
-          this.groups = groupsData
-        })
-      })
-
-      this.getUserPosts(tmpUsername, data => {
-        this.$set(this, 'posts', data)
-      })
-
-      return tmpUsername
+      return this.$route.params.name
     }
   },
 
@@ -121,7 +114,28 @@ export default {
 
     closePost () {
       this.showPost = false
+    },
+
+    updateData (page) {
+      this.getUserPosts(this.username, page, data => {
+        this.posts = data.data
+        this.postsCount = data.count
+      })
+
+      this.getUserData(this.username, data => {
+        this.userData = data
+        // 获取小组数据
+        if (data.groups.length > 0) {
+          this.getGroupData(data.groups, groupsData => {
+            this.groups = groupsData
+          })
+        }
+      })
     }
+  },
+
+  mounted () {
+    this.updateData(1)
   }
 }
 </script>
@@ -141,6 +155,11 @@ export default {
   margin-top: -20px;
 }
 
+.pageSelector {
+  margin-top: 4px;
+  text-align: center;
+}
+
 .fade-enter-active, .fade-leave-active {
   transition: opacity .5s;
 }
@@ -155,7 +174,7 @@ export default {
 }
 
 .card-margin {
-  width: 80%;
+  /* width: 80%; */
   margin-bottom: 10px;
 }
 </style>

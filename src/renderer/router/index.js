@@ -48,6 +48,30 @@ const router = new Router({
         {
           path: 'edit',
           component: require('@/components/HomePage/EditPanel').default
+        },
+        {
+          path: 'wiki',
+          component: require('@/components/HomePage/WikiPanel').default
+        },
+        {
+          path: 'new-wiki',
+          component: require('@/components/HomePage/WikiPanel/NewPage').default
+        },
+        {
+          path: 'notifications',
+          component: require('@/components/HomePage/NotificationsPanel').default
+        },
+        {
+          path: 'post',
+          component: require('@/components/HomePage/HomePanel/PostPart').default
+        },
+        {
+          path: 'search',
+          component: require('@/components/HomePage/SearchPanel').default
+        },
+        {
+          path: 'star',
+          component: require('@/components/HomePage/StarPanel').default
         }
       ]
     },
@@ -59,7 +83,7 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
-  if (window.localStorage.email) {
+  if (window.localStorage.username) {
     next()
   } else if (to.path !== '/welcome') {
     Vue.prototype.$Message.error('检测到您还未登陆，请先登录')
