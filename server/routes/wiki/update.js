@@ -38,6 +38,7 @@ router.post('/groups', function (req, res) {
   })
 })
 
+// 需要外网可访问
 // http://172.26.73.221:3000/wiki/update/hooks
 router.post('/hooks', function (req, res) {
   console.log(req.body)

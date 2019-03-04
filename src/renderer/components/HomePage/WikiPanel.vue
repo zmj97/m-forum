@@ -18,10 +18,12 @@
             <h3 class="bold120pc" @click="showAllVersions=false">Revisions(点击关闭)</h3>
             <ul v-for="item in page.allVersions">
               <li>
-                <p class="bold120pc" @click="page.lastestVersion = item">{{ item.editMessage }}</p>
+                <p class="bold120pc" @click="clickOldVersion(item)">{{ item.editMessage }}</p>
                 <div>
                   <span class="bold120pc">
-                    {{ item.username }}
+                    <router-link :to="'/home/user/' + item.username">
+                      {{ item.username }}
+                    </router-link>
                   </span>
                   修改于
                   {{ item.time | timeFilter }}
@@ -31,9 +33,12 @@
           </section>
         </transition>
 
-        <h1>{{ page.title }} </h1>
+        <h1 id="title">{{ page.title }} </h1>
         <div class="page-info">
-          {{ page.lastestVersion.username }} 修改于
+          <router-link :to="'/home/user/' + page.lastestVersion.username">
+            {{ page.lastestVersion.username }}
+          </router-link>
+          修改于
           {{ page.lastestVersion.time | timeFilter }} · 
           <span class="versions-hint" @click="showAllVersions = !showAllVersions">{{ page.allVersions.length }} 个版本</span>
 
@@ -224,6 +229,11 @@ export default {
     cancelUpdateGroups () {
       this.showModifyGroups = false
       this.groups = this.page.groups
+    },
+
+    clickOldVersion (item) {
+      this.page.lastestVersion = item
+      window.location.hash = '#title'
     }
   },
 

@@ -1,31 +1,34 @@
 <template>
-  <nav class="toolbar">
-    <Menu mode="horizontal" :active-name="menuActive">
-      <MenuItem name="1" to="/home/home">
-        <Icon type="ios-home" />
-        主页
-      </MenuItem>
+  <!-- 可拖动 -->
+  <nav id="toolbar" style="-webkit-app-region: drag">
+    <Menu :mode="menuMode" width="118px" :active-name="menuActive" class="menu">
 
-      <MenuItem name="2" to="/home/groups">
-        <Icon type="ios-people" />
-        小组
-      </MenuItem>
+      <!-- 窗口选项： 关闭、最大化、最小化 -->
+      <div class="window-buttons" style="-webkit-app-region: no-drag">
+        <!-- 关闭窗口 -->
+        <Icon
+         class="window-button"
+         type="md-power"
+         style="color: #ed4014"
+         @click="closeWindow"
+        />
+        <!-- 最大化窗口 -->
+        <Icon
+         class="window-button"
+         type="md-browsers"
+         style="color: #19be6b"
+         @click="maximizeWindow"
+        />
+        <!-- 最小化窗口 -->
+        <Icon
+         class="window-button"
+         type="md-remove"
+         style="color: #ff9900"
+         @click="minimizeWindow"
+        />
+      </div>
 
-      <MenuItem name="3" to="/home/new-post">
-        <Icon type="ios-paper" />
-        发帖
-      </MenuItem>
-
-      <MenuItem name="4" to="/home/wiki">
-        <Icon type="ios-book" />
-        Wiki
-      </MenuItem>
-
-
-      <Input v-model="searchStr" @on-enter="search()" suffix="ios-search" placeholder="搜索" class="search-bar" />
-
-
-      <MenuItem name="6" style="float:right">
+      <MenuItem name="6" style="-webkit-app-region: no-drag">
         <Dropdown :transfer=true>
 
           <router-link href="javascript:void(0)" :to="'/home/user/' + username">
@@ -34,7 +37,7 @@
              :avatar="avatar"
              :size=1
             ></m-avatar>
-            <Badge v-if="$newNt" dot style="margin: 5px"></Badge>
+            <Badge v-if="hasNewNt" dot style="margin: 5px"></Badge>
             {{ username }}
             <Icon type="ios-arrow-down"></Icon>
           </router-link>
@@ -53,7 +56,7 @@
             <router-link to="/home/notifications">
               <DropdownItem>
                 消息通知
-                <Badge v-if="$newNt" dot style="margin: 5px"></Badge>
+                <Badge v-if="hasNewNt" dot style="margin: 5px"></Badge>
               </DropdownItem>
             </router-link>
 
@@ -72,14 +75,45 @@
 
         </Dropdown>
       </MenuItem>
+      
+      <MenuItem name="1" to="/home/home" style="-webkit-app-region: no-drag">
+        <Icon type="ios-home" />
+        主页
+      </MenuItem>
+
+      <MenuItem name="2" to="/home/groups" style="-webkit-app-region: no-drag">
+        <Icon type="ios-people" />
+        小组
+      </MenuItem>
+
+      <MenuItem name="3" to="/home/new-post" style="-webkit-app-region: no-drag">
+        <Icon type="ios-paper" />
+        发帖
+      </MenuItem>
+
+      <MenuItem name="4" to="/home/wiki" style="-webkit-app-region: no-drag">
+        <Icon type="ios-book" />
+        Wiki
+      </MenuItem>
+
+
+      <Input v-model="searchStr" @on-enter="search()" suffix="ios-search" placeholder="搜索" class="search-bar" style="-webkit-app-region: no-drag" />
+
     </Menu>
   </nav>
 </template>
 
 <script>
+const {ipcRenderer: ipc} = require('electron')
+
 export default {
 
   name: 'SideBar',
+
+  props: [
+    // 是否有新消息
+    'hasNewNt'
+  ],
 
   data () {
     return {
@@ -87,7 +121,9 @@ export default {
       username: this.$store.state.Users.currentUser.username,
       avatar: null,
 
-      searchStr: ''
+      searchStr: '',
+
+      menuMode: 'horizontal'
     }
   },
 
@@ -132,6 +168,29 @@ export default {
       this.getUserData(this.username, data => {
         this.avatar = data.avatar
       })
+    },
+
+    // 最小化窗口
+    minimizeWindow () {
+      ipc.send('min')
+    },
+
+    // 最大化窗口
+    maximizeWindow () {
+      ipc.send('max')
+    },
+
+    // 最小化窗口
+    closeWindow () {
+      ipc.send('close')
+    },
+
+    changeMenuMode () {
+      if (document.body.clientWidth < 768) {
+        this.menuMode = 'vertical'
+      } else {
+        this.menuMode = 'horizontal'
+      }
     }
   },
 
@@ -145,19 +204,33 @@ export default {
     this.updateMenu()
     this.getAvatar()
 
-    // 更新是否有新的通知消息
-    this.$http.post('/user/find/newNt', {
-      'username': this.getCurrentUser().username
-    }).then(res => {
-      if (res.data !== 'error') {
-        this.setNewNt(res.data.newApplyNt || res.data.newResultNt || res.data.newReplyNt)
-      }
-    })
+    this.changeMenuMode()
+    window.addEventListener('resize', this.changeMenuMode, false)
+  },
+
+  destroyed () {
+    window.removeEventListener('resize', this.changeMenuMode, false)
   }
 }
 </script>
 
 <style lang="less" scoped>
+.window-buttons {
+  float: right;
+  width: 30px;
+  line-height: 1.5;
+
+  .window-button {
+    cursor: pointer;
+    transition: opacity .2s, text-shadow .2s;
+
+    &:hover {
+      opacity: .8;
+      text-shadow: 0 0 1px gray;
+    }
+  }
+}
+
 .letter-avatar {
   margin-right: 5px;
   background-color: #fde3cf;
@@ -166,6 +239,29 @@ export default {
 }
 
 .search-bar {
-  width: calc(100vw - 550px - 2rem);
+  width: calc(100vw - 550px - 5rem);
+  max-width: 500px;
+}
+
+@media screen and (max-width: 768px) {
+  .menu {
+    position: fixed;
+    top: 30px;
+    right: 0;
+    height: 350px;
+    box-shadow: 0 0 2px gray;
+  }
+
+  .window-buttons {
+    position: absolute;
+    bottom: 0;
+    width: 118px;
+    letter-spacing: 5px;
+  }
+
+  .search-bar {
+    margin-top: 10px;
+    width: 100px;
+  }
 }
 </style>

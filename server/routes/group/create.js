@@ -25,21 +25,15 @@ router.post('/join', function (req, res) {
       // 如果小组开放加入
       addMember(req, res)
     } else {
+      res.send('applied')
       // 如果小组未开放加入，需要申请经过组长同意
       db.push('users', {'username': req.body.leader}, {'applyNotifications': {
         'username': req.body.username,
         'groupName': req.body.name
-      }}, function (err, data) {
-        if (err) {
-          console.error(err)
-          return res.send('error')
-        } else {
-          db.update('users', {'username': req.body.leader}, {
-            'newApplyNt': true,
-          }, () => {})
-          res.send('applied')
-        }
-      })
+      }}, () => {})
+      db.update('users', {'username': req.body.leader}, {
+        'newApplyNt': true,
+      }, () => {})
     }
   })
 })

@@ -1,7 +1,6 @@
 'use strict'
 
-import { app, BrowserWindow } from 'electron'
-// import store from '../renderer/store/index.js'
+import { app, BrowserWindow, ipcMain } from 'electron'
 
 /**
  * Set `__static` path to static files in production
@@ -22,11 +21,13 @@ function createWindow () {
    */
   mainWindow = new BrowserWindow({
     title: 'm-forum',
+    width: 1000,
     height: 563,
     useContentSize: true,
-    width: 1000,
     minWidth: 350,
-    minHeight: 300,
+    minHeight: 400,
+    // 无边框
+    frame: false,
     icon: __static + '/icons/256x256.png',
     webPreferences: {
       // 关闭不可读取本地资源的限制
@@ -34,6 +35,7 @@ function createWindow () {
     }
   })
 
+  // 不显示菜单栏
   mainWindow.setMenu(null)
 
   mainWindow.loadURL(winURL)
@@ -58,6 +60,19 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
+// 监听最大化最小化和关闭窗口
+ipcMain.on('min', e => mainWindow.minimize())
+
+ipcMain.on('max', e => {
+  if (mainWindow.isMaximized()) {
+    mainWindow.unmaximize()
+  } else {
+    mainWindow.maximize()
+  }
+})
+
+ipcMain.on('close', e => mainWindow.close())
 
 /**
  * Auto Updater

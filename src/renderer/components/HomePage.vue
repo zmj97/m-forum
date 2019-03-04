@@ -1,8 +1,19 @@
 <template>
   <div id="layout">
-    <side-bar id="nav"></side-bar>
+    <side-bar
+     v-if="showMenuBar"
+     id="nav"
+     :hasNewNt="hasNewNt"
+     @click.native="hideMenu"
+    ></side-bar>
 
-    <router-view id="panel"></router-view>
+    <Icon id="menu-icon" type="md-menu" @click="showMenuBar=!showMenuBar" />
+
+    <router-view
+     id="panel"
+     @click.native="hideMenu"
+     @newNtChange="hasNewNt = $event"
+    ></router-view>
   </div>
 </template>
 
@@ -19,7 +30,46 @@ export default {
 
   data () {
     return {
+      showMenuBar: false,
+      // 是否有新消息
+      hasNewNt: false
     }
+  },
+
+  methods: {
+    changeShowMenuBar () {
+      if (document.body.clientWidth >= 768) {
+        this.showMenuBar = true
+      } else {
+        this.showMenuBar = false
+      }
+    },
+
+    // 移动端点击后关闭sidebar
+    hideMenu (e) {
+      if (e.target.placeholder === '搜索') return
+      if (document.body.clientWidth < 768) {
+        this.showMenuBar = false
+      }
+    }
+  },
+
+  mounted () {
+    window.addEventListener('resize', this.changeShowMenuBar, false)
+    this.changeShowMenuBar()
+
+    // 更新是否有新的通知消息
+    this.$http.post('/user/find/newNt', {
+      'username': this.getCurrentUser().username
+    }).then(res => {
+      if (res.data !== 'error') {
+        this.hasNewNt = res.data.newApplyNt || res.data.newResultNt || res.data.newReplyNt
+      }
+    })
+  },
+
+  destroyed () {
+    window.removeEventListener('resize', this.changeShowMenuBar, false)
   }
 }
 </script>
@@ -32,8 +82,18 @@ export default {
 
 /* 手机中 nav 不显示，而是显示菜单按钮 */
 #nav {
-  display: none;
+  // display: none;
   text-align: center;
+}
+
+#menu-icon {
+  position: fixed;
+  top: 30px;
+  right: 0;
+  font-size: 30px;
+  color: #515a6e;
+  cursor: pointer;
+  z-index: 899;
 }
 
 #panel {
@@ -46,6 +106,10 @@ export default {
  * 上 nav 下 router-view
  */
 @media screen and (min-width: 768px) {
+  #menu-icon {
+    display: none;
+  }
+
   /* 设置背景色 */
   #layout {
     position: relative;

@@ -1,12 +1,5 @@
 exports.install = function (Vue, options) {
-  var proto = Vue.prototype
-
-  // 是否新的通知消息
-  proto.$newNt = false
-
-  proto.setNewNt = function (value) {
-    proto.$newNt = value
-  }
+  let proto = Vue.prototype
 
   // 获取指定的一些用户的数据
   proto.getUserData = function (names, callback, falseCallback = () => {}) {
@@ -15,7 +8,7 @@ exports.install = function (Vue, options) {
      * 一个username(string), 或：
      * [{'username': username0}, {'username': username1}, ....]
      */
-    var usernames
+    let usernames
     if (typeof names === 'string') {
       usernames = names
     } else {
@@ -58,7 +51,7 @@ exports.install = function (Vue, options) {
      * groupNames:
      * [{'name': name0}, {'name': name1}, ....]
      */
-    var groupNames
+    let groupNames
     if (typeof groups === 'string') {
       groupNames = [{'name': groups}]
     } else {
@@ -141,8 +134,9 @@ exports.install = function (Vue, options) {
 
   // 对目标reply进行闪烁time次提示
   proto.hintReply = function (replyId, time) {
+    if (!document.getElementById(replyId)) return
     if (time <= 0) return
-    var timeGap = 250
+    const timeGap = 250
     setTimeout(() => {
       document.getElementById(replyId).style.backgroundColor = 'rgba(92, 173, 255, 0.4)'
     }, timeGap * 2 * time - timeGap)

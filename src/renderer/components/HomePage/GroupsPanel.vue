@@ -6,7 +6,11 @@
           <router-link :to="'/home/group/' + item.name">
             <Card class="group">
               <p slot="title">{{ item.name }}</p>
-              <p>{{ item.leader }}</p>
+              <p>
+                <router-link :to="'/home/user/' + item.leader">
+                  {{ item.leader }}
+                </router-link>
+              </p>
               <p>{{ item.intro }}</p>
             </Card>
           </router-link>
@@ -17,7 +21,11 @@
           <router-link :to="'/home/group/' + item.name">
             <Card class="group">
               <p slot="title">{{ item.name }}</p>
-              <p>{{ item.leader }}</p>
+              <p>
+                <router-link :to="'/home/user/' + item.leader">
+                  {{ item.leader }}
+                </router-link>
+              </p>
               <p>{{ item.intro }}</p>
             </Card>
           </router-link>

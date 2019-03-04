@@ -3,7 +3,7 @@
   <div class="opacityBackground">
     <post-part class="post" v-if="posts[posCurrent]" :postData="posts[posCurrent]"></post-part>
 
-    <Icon class="button close" type="md-close-circle" @click="closeModal" />
+    <Icon class="button close" type="md-close-circle" @click="closeModal" style="-webkit-app-region: no-drag" />
 
     <Icon v-show="posCurrent!==0" @click="posCurrent--" class="button left" type="md-arrow-dropleft-circle" />
 

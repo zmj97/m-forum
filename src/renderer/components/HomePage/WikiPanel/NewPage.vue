@@ -19,7 +19,7 @@
        clearable
        placeholder="可选择要限定的小组(多选)"
        not-found-text="还没有小组"
-       style="width: auto;"
+       style="width: auto;z-index: 499;"
        class="set-groups"
       >
         <Option 

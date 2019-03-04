@@ -146,6 +146,24 @@ exports.pull = function (collectionName, searchJson, dataJson, callback) {
   })
 }
 
+// 从数组中根据index删除数据
+exports.pullByIndex = function (collectionName, searchJson, arrayName, index, callback) {
+  __connectDb(function (client, db) {
+    let key = arrayName + '.' + index
+    let unsetJson = {}
+    unsetJson[key] = 1
+    db.collection(collectionName).updateOne(searchJson, {$unset: unsetJson}, function (err, data) {
+      if (!err) {
+        let pullJson = {}
+        pullJson[arrayName] = null
+        db.collection(collectionName).updateOne(searchJson, {$pull: pullJson})
+      }
+      client.close()
+      callback(err, data)
+    })
+  })
+}
+
 // 删除集合
 exports.drop = function (collectionName) {
   __connectDb(function (client, db) {

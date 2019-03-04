@@ -15,17 +15,8 @@
       <Modal
         v-model="modalCancel"
         title="放弃发布"
-        :zIndex=5000
-        @on-ok="okCancel">
+        :zIndex=5000>
         <p>确定要放弃发布这篇帖子么？您将丢失您编辑的所有内容！</p>
-      </Modal>
-      <Button type="info" class="float-right" @click="modalDraft = true">存为草稿</Button>
-      <Modal
-        v-model="modalDraft"
-        title="存为草稿"
-        :zIndex=5000
-        @on-ok="okDraft">
-        <p>确定要保存为草稿么？</p>
       </Modal>
 
       <Select
@@ -123,7 +114,6 @@ export default {
 
       // 对话框
       modalPost: false,
-      modalDraft: false,
       modalCancel: false
     }
   },
@@ -166,14 +156,6 @@ export default {
           this.$Message.error('网络连接失败!')
           console.error(err)
         })
-    },
-
-    okCancel () {
-
-    },
-
-    okDraft () {
-
     }
   },
 

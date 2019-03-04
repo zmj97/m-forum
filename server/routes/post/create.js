@@ -28,46 +28,30 @@ router.post('/reply', function (req, res) {
       console.error('数据库错误!')
       return res.send('error')
     } else {
+      res.send('success')
       // 更新最后修改时间
-      db.update('posts', {'_id': require('mongodb').ObjectId(req.body._id)}, {'lastModifyTime': req.body.reply.time}, function (err, data) {
-        if (err) {
-          console.error('数据库错误!')
-          return res.send('error')
-        } else {
-          // 更新被回复人的消息(回复自己的帖子不提醒)
-          if (req.body.username !== req.body.reply.username) {
-            // 先获取评论是第几楼（从0开始）
-            db.find('posts', [{'_id': require('mongodb').ObjectId(req.body._id)}, {'replys': 1}], function (err, data) {
-              if (err) {
-                console.log(err)
-                return res.send('error')
-              } else {
-                // index 即为第几楼
-                var index = data[0].replys.findIndex(function (item) { 
-                  return item.time === req.body.reply.time
-                })
-                // 向被回复用户添加通知
-                db.push('users', {'username': req.body.username}, {'replyNotifications': {
-                  'username': req.body.reply.username,
-                  'title': req.body.title,
-                  'postId': req['body']['_id'],
-                  'replyIndex': index
-                }}, function (err, data) {
-                  if (err) {
-                    console.log(err)
-                    return res.send('error')
-                  } else {
-                    db.update('users', {'username': req.body.username}, {
-                      'newReplyNt': true,
-                    }, () => {})
-                    return res.send('success')
-                  }
-                }, true) // 可重复
-              }
-            })
-          }
-        }
-      })
+      db.update('posts', {'_id': require('mongodb').ObjectId(req.body._id)}, {'lastModifyTime': req.body.reply.time}, () => {})
+      // 更新被回复人的消息(回复自己的帖子不提醒)
+      if (req.body.username !== req.body.reply.username) {
+        // 先获取评论是第几楼（从0开始）
+        db.find('posts', [{'_id': require('mongodb').ObjectId(req.body._id)}, {'replys': 1}], function (err, data) {
+          // index 即为第几楼
+          let index = data[0].replys.findIndex(function (item) { 
+            return item.time === req.body.reply.time
+          })
+          // 向被回复用户添加通知
+          db.push('users', {'username': req.body.username}, {'replyNotifications': {
+            'username': req.body.reply.username,
+            'title': req.body.title,
+            'postId': req['body']['_id'],
+            'replyIndex': index
+          }}, () => {}, true) // 可重复
+        })
+        db.update('users', {'username': req.body.username}, {
+          'newReplyNt': true,
+        }, () => {})
+        return
+      }
     }
   })
 })
@@ -88,42 +72,23 @@ router.post('/reply-to-reply', function (req, res) {
       console.error('数据库错误!')
       return res.send('error')
     } else {
+      res.send('success')
       // 更新最后修改时间
-      db.update('posts', {'_id': require('mongodb').ObjectId(req.body._id)}, {'lastModifyTime': req.body.reply.time}, function (err, data) {
-        if (err) {
-          console.error('数据库错误!')
-          return res.send('error')
-        } else {
-          // 更新被回复人的消息(回复自己的评论不提醒)
-          if (req.body.username !== req.body.reply.username) {
-            // 先获取评论是第几楼（从0开始）
-            db.find('posts', [{'_id': require('mongodb').ObjectId(req.body._id)}, {'replys': 1}], function (err, data) {
-              if (err) {
-                console.log(err)
-                return res.send('error')
-              } else {
-                // 向被回复用户添加通知
-                db.push('users', {'username': req.body.username}, {'replyNotifications': {
-                  'username': req.body.reply.username,
-                  'title': req.body.title,
-                  'postId': req['body']['_id'],
-                  'replyIndex': req.body.replyIndex
-                }}, function (err, data) {
-                  if (err) {
-                    console.log(err)
-                    return res.send('error')
-                  } else {
-                    db.update('users', {'username': req.body.username}, {
-                      'newReplyNt': true,
-                    }, () => {})
-                    return res.send('success')
-                  }
-                }, true) // 可重复
-              }
-            })
-          }
-        }
-      })
+      db.update('posts', {'_id': require('mongodb').ObjectId(req.body._id)}, {'lastModifyTime': req.body.reply.time}, () => {})
+      // 更新被回复人的消息(回复自己的评论不提醒)
+      if (req.body.username !== req.body.reply.username) {
+        // 向被回复用户添加通知
+        db.push('users', {'username': req.body.username}, {'replyNotifications': {
+          'username': req.body.reply.username,
+          'title': req.body.title,
+          'postId': req['body']['_id'],
+          'replyIndex': req.body.replyIndex
+        }}, () => {}, true) // 可重复
+        db.update('users', {'username': req.body.username}, {
+          'newReplyNt': true,
+        }, () => {})
+        return
+      }
     }
   })
 })

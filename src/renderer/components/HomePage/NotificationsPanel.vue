@@ -123,7 +123,7 @@ export default {
       formData['username'] = this.getCurrentUser().username
       this.$set(this, name, false)
       this.$http.post('/user/update/newNt', formData)
-      this.setNewNt(this.newApplyNt || this.newResultNt || this.newReplyNt)
+      this.$emit('newNtChange', this.newApplyNt || this.newResultNt || this.newReplyNt)
     },
 
     clearNt (typeName) {

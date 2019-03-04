@@ -30,7 +30,7 @@ router.get('*', function (req, res) {
   })
 })
 
-var url = 'http://localhost:3000/statics/'
+var url = 'http://172.26.73.221:3000/statics/'
 router.post('/upload', function (req, res) {
    // 保存图片
    // 返回[[pos, url], [pos, url]...]

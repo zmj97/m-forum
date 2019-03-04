@@ -60,6 +60,7 @@ export default {
           }
           // 更新选中数组selected
           this.selected[0] = true
+          this.selectedPos = 0
           for (var i = 1; i < this.posts.length; i++) {
             this.selected[i] = false
           }
@@ -123,7 +124,7 @@ export default {
   #list, #main {
     position: fixed;
     top: @navHeight + @gapWidth;
-    bottom: @gapWidth;
+    bottom: 0;
     box-shadow: 0 0 10px black;
     overflow: auto;
   }

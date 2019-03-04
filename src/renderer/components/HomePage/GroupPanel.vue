@@ -11,7 +11,7 @@
         <span class="name">{{ name }}</span>
 
         <!-- 组长可进行的操作 -->
-        <span v-if="currentUser === leader" style="line-height: 3">
+        <div v-if="currentUser === leader" style="line-height: 3">
           <!-- 设置是否开放加入 -->
           <Poptip trigger="hover" placement="bottom" title="开放加入" content="开启后用户可直接加入，关闭时用户需要申请通过组长同意">
             <i-switch @on-change="changeJoinPublic" style="margin: 0 1rem">
@@ -34,7 +34,7 @@
           <!-- 组长可以修改小组头像 -->
           <Button style="padding: 1px 3px; margin-left: 1rem" type="info" @click="changeAvatar()">修改头像</Button>
           <input id="inputFile" type="file" @change="inputImg" style="display: none" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg">
-        </span>
+        </div>
 
         <!-- 加入小组按钮，用户未加入此小组时显示 -->
         <button v-if="!users.includes(currentUser)" class="join-button" @click="modalJoin = true">加入</button>
@@ -212,6 +212,7 @@ export default {
             .then(res => {
               if (res.data === 'success') {
                 this.$Message.success('修改成功')
+                this.$router.push('/home/group/' + this.name)
                 location.reload()
               } else {
                 this.$Message.error('修改失败')

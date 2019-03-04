@@ -35,7 +35,11 @@
           <router-link :to="'/home/group/' + item.name">
             <Card class="card-margin">
               <p slot="title">{{ item.name }}</p>
-              <p>{{ item.leader }}</p>
+              <p>
+                <router-link :to="'/home/user/' + item.leader">
+                  {{ item.leader }}
+                </router-link>
+              </p>
               <p>{{ item.intro }}</p>
             </Card>
           </router-link>
@@ -149,6 +153,7 @@ export default {
 .user-avatar {
   max-width: 60%;
   margin-bottom: 80px;
+  transform: scale(3);
 }
 
 .modifyButton {
@@ -165,12 +170,6 @@ export default {
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
-}
-
-@media screen and (min-width: 768px) {
-  .user-avatar {
-    transform: scale(3);
-  }
 }
 
 .card-margin {

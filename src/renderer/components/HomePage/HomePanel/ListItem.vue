@@ -1,25 +1,42 @@
 <template>
+  <!-- 父组件传入props selected表示是否选中 -->
   <article 
    class="item-container"
    :class="{selected: selected}"
   >
+    <!-- 发帖人头像在左边 -->
     <div class="left">
-      <m-avatar
-       :avatar="avatar"
-       :size=3
-      ></m-avatar>
+      <!-- 点击可以跳转到发帖人主页 -->
+      <router-link :to="'/home/user/' + itemData.username">
+        <m-avatar
+         :avatar="avatar"
+         :size=3
+        ></m-avatar>
+      </router-link>
     </div>
 
+    <!-- 其他信息在右边 -->
     <div class="right">
-      <h4 class="item-name">{{ itemData.username }}</h4>
+      <!-- 发帖人用户名，点击可以跳转到发帖人主页 -->
+      <h4>
+        <!-- router-link只包含文字，因此防止点击空白处也跳转 -->
+        <router-link :to="'/home/user/' + itemData.username"  class="item-name">
+        {{ itemData.username }}
+        </router-link>
+      </h4>
+      <!-- 帖子标题 -->
       <h3 class="item-title">{{ itemData.title }}</h3>
+      <!-- 摘要 -->
       <p class="item-abstract">
+        <!-- 有摘要显示摘要，没有摘要显示内容， 文字超出部分用省略号表示 -->
         <span v-if="itemData.abstract">{{ itemData.abstract }}</span>
         <span v-else>{{ itemData.content }}</span>
       </p>
 
-      <router-link :to="'/home/group/' + itemData.group">
-        <Tag v-if="!inGroupPage && itemData.group" color="success" class="group">{{ itemData.group }}</Tag>
+      <!-- 小组主页中不显示小组标签 -->
+      <!-- 如果有限制小组查看权限，显示小组名，点击可跳转到小组主页 -->
+      <router-link v-if="!inGroupPage && itemData.group" :to="'/home/group/' + itemData.group">
+        <Tag color="success" class="group">{{ itemData.group }}</Tag>
       </router-link>
     </div>
   </article>
@@ -31,9 +48,11 @@ export default {
   name: 'ListItem',
 
   props: {
+    // 数据必需
     itemData: {
       require: true
     },
+    // 是否选中默认为未选中，因此仅选中的item传递selected即可
     selected: {
       default: false
     }
@@ -41,12 +60,19 @@ export default {
 
   data () {
     return {
+      // 发帖人头像
       avatar: null,
+      /*
+       小组主页显示帖子也使用本组件
+       小组主页中不显示小组标签
+       因此此变量用于判断是否在小组主页中
+       */
       inGroupPage: this.$route.matched[1].path.indexOf('group') !== -1
     }
   },
 
   methods: {
+    // 获取发帖人头像
     getAvatar () {
       this.getUserData(this.itemData.username, data => {
         this.avatar = data.avatar
@@ -85,8 +111,8 @@ export default {
   .item-title,
   .item-abstract {
     margin: 0;
-    // 超出部分省略
     overflow: hidden;
+    // 超出部分用...代替
     text-overflow:ellipsis;
     white-space: nowrap;
   }
@@ -109,6 +135,7 @@ export default {
   }
 }
 
+// 选中的item背景色、字体颜色、字体大小不同
 .selected {
   background-color: #2b85e4;
   color: white;

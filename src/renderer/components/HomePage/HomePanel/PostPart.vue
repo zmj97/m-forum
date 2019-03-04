@@ -2,14 +2,18 @@
   <div v-if="postDataFinal" style="overflow: auto">
     <div id="detail">
       <!-- 有头像时显示头像，无头像时显示字符头像 -->
-      <m-avatar
-       :avatar="avatar"
-       :size=3
-      ></m-avatar>
+      <router-link :to="'/home/user/' + postDataFinal.username">
+        <m-avatar
+         :avatar="avatar"
+         :size=3
+        ></m-avatar>
+      </router-link>
       <!-- 相关信息 -->
       <div class="info">
         <!-- 用户名 -->
-        <span class="username info-left">{{ postDataFinal.username }}</span>
+        <router-link :to="'/home/user/' + postDataFinal.username">
+          <span class="username info-left">{{ postDataFinal.username }}</span>
+        </router-link>
         <!-- 发表时间 -->
         <span class="info-right">编辑于{{ postDataFinal.time | timeFilter }}</span>
         <br /> 
@@ -52,20 +56,24 @@
        :id="'reply-'+index"
        :postId="postDataFinal._id"
        :title="postDataFinal.title"
+       @removeReply="postDataFinal.replys.splice(index, 1)"
       ></reply-item>
     </section>
     <!-- 没有回复时提示 -->
     <p v-else class="no-reply">快来当第一个回复的人吧！</p>
 
     <!-- 添加回复 -->
-    <section id="new-reply">
-      <!-- 传递帖子id、标题和帖子的发帖人 -->
-      <new-reply 
-       :_id="postDataFinal._id" 
-       :title="postDataFinal.title"
-       :username="postDataFinal.username"
-      ></new-reply>
-    </section>
+    <transition name="fade">
+      <section v-if="showNewReply" id="new-reply">
+        <!-- 传递帖子id、标题和帖子的发帖人 -->
+        <new-reply 
+         :_id="postDataFinal._id" 
+         :title="postDataFinal.title"
+         :username="postDataFinal.username"
+         @appendReply="appendDataToReply"
+        ></new-reply>
+      </section>
+    </transition>
 
     <!-- 功能键 -->
     <transition name="fade">
@@ -91,7 +99,7 @@
 
         <!-- 回复 -->
         <Tooltip content="回复">
-          <a href="#new-reply">
+          <a href="#new-reply" @click="showNewReply = !showNewReply">
             <Icon type="ios-text" />
           </a>
         </Tooltip>
@@ -149,7 +157,9 @@ export default {
       // 当前用户收藏的所有帖子id
       stars: [],
       // 是否显示返回按钮，在全屏显示时显示
-      showBack: false
+      showBack: false,
+      // 是否显示回复面板
+      showNewReply: false
     }
   },
 
@@ -270,6 +280,15 @@ export default {
       this.$router.back(-1)
     },
 
+    // 提交新的回复时，将新的数据push到postDataFinal.replys中
+    appendDataToReply (data) {
+      this.postDataFinal.replys.push(data)
+      // 并跳转闪烁
+      let replyId = 'reply-' + (this.postDataFinal.replys.length - 1).toString()
+      window.location.hash = '#' + replyId
+      setTimeout(() => { this.hintReply(replyId, 5) }, 0)
+    },
+
     // 利用query传入的帖子id可能不存在
     postNotExist () {
       this.$Message.error('该帖子不存在！')
@@ -278,7 +297,7 @@ export default {
 
     // 确保在低宽度中固定菜单在帖子列表中不显示
     scrollListener () {
-      if (document.body.clientWidth > 768) return
+      if (document.body.clientWidth > 768 || !document.getElementById('list')) return
       let postPosition = (document.documentElement.scrollTop || document.body.scrollTop) - document.getElementById('list').scrollHeight + 300
       if (this.showFixMenu && postPosition < 0) {
         this.showFixMenu = false
@@ -289,7 +308,7 @@ export default {
     resizeListener () {
       if (document.body.clientWidth > 768) {
         this.showFixMenu = true
-      } else {
+      } else if (this.$route.query.postId === undefined) {
         this.showFixMenu = false
       }
     }
@@ -325,14 +344,16 @@ export default {
           } else {
             this.postDataFinal = res.data[0]
             this.getAvatar()
-            if (!this.$route.query.replyIndex) return
-            // scroll到query传入的回复楼层并闪烁提示
-            setTimeout(() => {
-              var replyId = 'reply-' + this.$route.query.replyIndex
-              window.location.hash = '#' + replyId
-              // 闪烁提示五次
-              this.hintReply(replyId, 5)
-            }, 0)
+            this.getStars()
+            if (this.$route.query.replyIndex) {
+              // scroll到query传入的回复楼层并闪烁提示
+              setTimeout(() => {
+                var replyId = 'reply-' + this.$route.query.replyIndex
+                window.location.hash = '#' + replyId
+                // 闪烁提示五次
+                this.hintReply(replyId, 5)
+              }, 0)
+            }
           }
         })
         .catch(err => {
@@ -343,10 +364,8 @@ export default {
     } else {
       // 利用props传递帖子数据
       this.getAvatar()
+      this.getStars()
     }
-
-    // 获取所有收藏的帖子id
-    setTimeout(() => { this.getStars() }, 0)
 
     // 添加滚动和改变大小的监听，
     // 保证窄屏时固定按钮不会在帖子列表中显示
@@ -374,7 +393,7 @@ export default {
 #fix-menu {
   position: fixed;
   width: 25px;
-  top: 50%;
+  top: 60%;
   right: 1rem;
   font-size: 1.5rem;
   color: #19be6b;

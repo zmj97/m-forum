@@ -34,14 +34,15 @@ router.post('*', function (req, res) {
       console.error('数据库错误!')
       return res.send('error')
     } else {
-      var usernames = []
+      res.send('success')
+      let usernames = []
       data[0].users.forEach(username => {
         usernames.push({'username': username})
       })
       db.pull('users', {$or: usernames}, {'groups': req.body.name}, data => {})
       db.delete('groups', {'name': req.body.name}, data => {})
       db.delete('posts', {'group': req.body.name}, data => {})
-      return res.send('success')
+      return
     }
   })
 

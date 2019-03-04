@@ -20,6 +20,10 @@ app.use('/wiki', wiki)
 app.use('/group', group)
 app.use('/statics', statics)
 
+app.get('*', function (req, res) {
+  res.send('无效的请求！')
+})
+
 app.listen(3000, function () {
   console.log('listening port 3000...')
 })
