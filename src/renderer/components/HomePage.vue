@@ -117,7 +117,7 @@ export default {
   }
 
   /* 平板以上 显示 nav */
-  #nav {    
+  #nav {
     display: block;
     margin-bottom: 5px;
     box-shadow: 0 0 10px black;

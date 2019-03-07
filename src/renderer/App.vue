@@ -5,40 +5,31 @@
 </template>
 
 <script>
-  export default {
-    name: 'm-forum',
+export default {
+  name: 'm-forum',
 
-    provide () {
-      return {
-        reload: this.reload
-      }
-    },
+  provide () {
+    return {
+      reload: this.reload
+    }
+  },
 
-    data () {
-      return {
-        routerIsAlive: true
-      }
-    },
+  data () {
+    return {
+      routerIsAlive: true
+    }
+  },
 
-    methods: {
-      // 实现无闪烁刷新页面
-      reload () {
-        this.routerIsAlive = false
-        this.$nextTick(function () {
-          this.routerIsAlive = true
-        })
-
-        // 更新是否有新的通知消息
-        this.$http.post('/user/find/newNt', {
-          'username': this.getCurrentUser().username
-        }).then(res => {
-          if (res.data !== 'error') {
-            this.setNewNt(res.data.newApplyNt || res.data.newResultNt || res.data.newReplyNt)
-          }
-        })
-      }
+  methods: {
+    // 实现无闪烁刷新页面
+    reload () {
+      this.routerIsAlive = false
+      this.$nextTick(function () {
+        this.routerIsAlive = true
+      })
     }
   }
+}
 </script>
 
 <style>
@@ -48,7 +39,7 @@ pre {
 }
 
 /* 滚动条样式 */
-::-webkit-scrollbar-track-piece { 
+::-webkit-scrollbar-track-piece {
   /* 滚动条凹槽的颜色，还可以设置边框属性 */
   background-color: #f8f8f8;
 }

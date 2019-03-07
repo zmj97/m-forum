@@ -4,7 +4,7 @@
 
       <TabPane label="帖子" name="posts">
         <div v-if="posts.length > 0">
-          <Card v-for="(item, index) in posts" :bordered="false" class="card-panel">
+          <Card v-for="(item, index) in posts" :bordered="false" class="card-panel" :key="index">
             <p v-html="highlightTitle(item.title)" slot="title"></p>
             <a @click="showPostModal(index)" slot="extra" style="float: right">点击查看</a>
             <p v-html="item.highlight"></p>
@@ -16,7 +16,7 @@
 
       <TabPane label="小组" name="groups">
         <div v-if="groups.length > 0">
-          <Col :xs="12" :sm="6" :md="4" :lg="3" v-for="item in groups">
+          <Col :xs="12" :sm="6" :md="4" :lg="3" v-for="item in groups" :key="item.name">
             <router-link :to="'/home/group/' + item.name">
               <Card style="margin: 1rem">
                 <p slot="title">{{ item.name }}</p>
@@ -36,7 +36,7 @@
 
       <TabPane label="Wiki" name="wikis">
         <CellGroup v-if="wikis.length > 0" class="card-panel cell-panel">
-          <Cell v-for="item in wikis" @click.native="toWikiPanel(item)" :title="item" class="cell">
+          <Cell v-for="item in wikis" @click.native="toWikiPanel(item)" :title="item" class="cell" :key="item">
           </Cell>
         </CellGroup>
 
@@ -227,7 +227,7 @@ export default {
     line-height: 5;
     font-weight: bold;
   }
-    
+
   &:hover {
     box-shadow: 0 0 1px gray;
   }

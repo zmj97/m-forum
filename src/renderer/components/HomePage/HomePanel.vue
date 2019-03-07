@@ -5,6 +5,7 @@
        v-for="(item, index) in posts"
        :itemData="item"
        :selected="selected[index]"
+       :key="index"
        @click.native="updateSelected(index)"
       ></list-item>
 
@@ -112,7 +113,6 @@ export default {
   margin: @gapWidth 0;
   text-align: center;
 }
-
 
 /*
  * -- 平板及以上设备 --

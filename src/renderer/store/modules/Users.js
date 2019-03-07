@@ -1,7 +1,7 @@
 const state = {
   currentUser: {
-    username: 'zmj',
-    avatar: __static + '/img/xy.jpg'
+    username: '',
+    avatar: ''
   }
 }
 

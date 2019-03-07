@@ -1,7 +1,7 @@
 <template>
   <div style="overflow: auto; background: #eee">
     <div v-if="stars.length > 0">
-      <Card v-for="item in stars" :bordered="false" class="card-panel">
+      <Card v-for="item in stars" :bordered="false" class="card-panel" :key="item.id">
         <p slot="title">{{ item.title }}</p>
         <a @click="toPostPanel(item.id)" slot="extra" type="success">点击查看</a>
         <p>{{ item.abstract }}</p>
@@ -35,7 +35,7 @@ export default {
         if (res.data === 'error') {
           this.$Message.error('数据库连接失败！')
         } else {
-          this.stars = res.data.stars
+          this.stars = res.data.stars.reverse()
         }
       }).catch(err => {
         console.error(err)

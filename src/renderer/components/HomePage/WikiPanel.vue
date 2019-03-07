@@ -16,7 +16,7 @@
         <transition name="fade">
           <section v-if="showAllVersions" id="versions">
             <h3 class="bold120pc" @click="showAllVersions=false">Revisions(点击关闭)</h3>
-            <ul v-for="item in page.allVersions">
+            <ul v-for="(item, index) in page.allVersions" :key="index">
               <li>
                 <p class="bold120pc" @click="clickOldVersion(item)">{{ item.editMessage }}</p>
                 <div>
@@ -39,7 +39,7 @@
             {{ page.lastestVersion.username }}
           </router-link>
           修改于
-          {{ page.lastestVersion.time | timeFilter }} · 
+          {{ page.lastestVersion.time | timeFilter }} ·
           <span class="versions-hint" @click="showAllVersions = !showAllVersions">{{ page.allVersions.length }} 个版本</span>
 
           <!-- 具有权限的人才可进行的操作 -->
@@ -60,21 +60,21 @@
           </Modal>
 
           <!-- 修改权限 -->
-          <transition name="fade"> 
+          <transition name="fade">
             <section v-if="showModifyGroups" style="padding: 15px 0">
               <!-- 提示 -->
               <p>不设定小组时，所有人均可浏览与编辑</p>
 
               <!-- 小组多选框 -->
               <Select
-               v-model="groups" 
+               v-model="groups"
                multiple
                clearable
                placeholder="修改要限定的小组(多选)"
                not-found-text="还没有小组"
                style="width: auto;"
               >
-                <Option 
+                <Option
                  v-for="group in allGroups"
                  :value="group.name"
                  :key="group.name"
@@ -98,13 +98,15 @@
             </section>
           </transition>
         </div>
+
+        <!-- content -->
         <article id="content" v-html="convertedContent"></article>
       </div>
 
       <!-- 所有page目录 -->
       <nav class="nav">
         <h3>Pages · {{ titles.length }}</h3>
-        <ul v-for="item in titles" id="titles">
+        <ul v-for="item in titles" id="titles" :key="item.title">
           <li><a @click="getPage(item.title)">{{ item.title }}</a></li>
         </ul>
       </nav>
@@ -239,7 +241,7 @@ export default {
 
   computed: {
     convertedContent () {
-      if (this.page === null) {
+      if (!this.page || !this.page.lastestVersion.content) {
         return ''
       }
       return mavonEditor.getMarkdownIt().render(this.page.lastestVersion.content)

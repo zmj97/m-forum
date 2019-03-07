@@ -1,0 +1,16 @@
+{
+  "name": "server2",
+  "version": "1.0.0",
+  "description": "server using mongoose",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "zmj97",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.16.4",
+    "md5-node": "^1.0.1",
+    "mongoose": "^5.4.17"
+  }
+}

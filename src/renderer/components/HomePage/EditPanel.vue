@@ -69,7 +69,7 @@ export default {
     },
 
     submitChange () {
-      var reader = new FileReader()
+      let reader = new FileReader()
       reader.readAsDataURL(this.img)
       reader.onload = e => {
         // 获取图片数据， 保存在e.target.result中
@@ -81,6 +81,7 @@ export default {
           this.formItem.avatar = res.data
           this.$http.post('/user/update/info', {'username': this.username, 'formdata': this.formItem})
             .then(res => {
+              console.log(res.data)
               if (res.data === 'success') {
                 this.$Message.success('修改成功')
                 this.$router.push('/home/user/' + this.username)

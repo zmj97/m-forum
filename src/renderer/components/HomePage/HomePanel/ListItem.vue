@@ -1,6 +1,6 @@
 <template>
   <!-- 父组件传入props selected表示是否选中 -->
-  <article 
+  <article
    class="item-container"
    :class="{selected: selected}"
   >

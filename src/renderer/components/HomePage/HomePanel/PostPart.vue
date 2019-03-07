@@ -16,7 +16,7 @@
         </router-link>
         <!-- 发表时间 -->
         <span class="info-right">编辑于{{ postDataFinal.time | timeFilter }}</span>
-        <br /> 
+        <br />
         <!-- 回复数量 -->
         <span class="info-right">回复 {{ replysCount }}</span>
       </div>
@@ -36,7 +36,7 @@
       </router-link>
       <!-- 标签 -->
       <div v-if="postDataFinal.tags.length > 0">
-        <Tag color="blue" v-for="item in postDataFinal.tags" style="margin: 5px">
+        <Tag color="blue" v-for="item in postDataFinal.tags" style="margin: 5px" :key="item">
           {{ item }}
         </Tag>
       </div>
@@ -56,6 +56,7 @@
        :id="'reply-'+index"
        :postId="postDataFinal._id"
        :title="postDataFinal.title"
+       :key="index"
        @removeReply="postDataFinal.replys.splice(index, 1)"
       ></reply-item>
     </section>
@@ -66,8 +67,8 @@
     <transition name="fade">
       <section v-if="showNewReply" id="new-reply">
         <!-- 传递帖子id、标题和帖子的发帖人 -->
-        <new-reply 
-         :_id="postDataFinal._id" 
+        <new-reply
+         :_id="postDataFinal._id"
          :title="postDataFinal.title"
          :username="postDataFinal.username"
          @appendReply="appendDataToReply"
@@ -102,6 +103,11 @@
           <a href="#new-reply" @click="showNewReply = !showNewReply">
             <Icon type="ios-text" />
           </a>
+        </Tooltip>
+
+        <!-- 删除帖子 -->
+        <Tooltip v-if="currentUser === postDataFinal.username" content="删除帖子">
+          <Icon @click="modalDelete = true" type="md-trash" style="cursor: pointer; color: #ed4014" />
         </Tooltip>
 
         <!-- 返回前一页 -->

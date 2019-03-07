@@ -5,9 +5,9 @@ const state = {
 }
 
 const mutations = {
-  SAVE_STORAGE (state, username) {
-    state.username = username
-    localStorage.setItem(key, JSON.stringify(username))
+  SAVE_STORAGE (state, payload) {
+    state.username = payload.username
+    localStorage.setItem(key, payload.username)
   },
   DEL_STORAGE (state) {
     state.username = null
@@ -16,8 +16,8 @@ const mutations = {
 }
 
 const actions = {
-  setStorage ({ commit }) {
-    commit('SAVE_STORAGE')
+  setStorage ({ commit }, payload) {
+    commit('SAVE_STORAGE', payload)
   },
 
   removeStorage ({ commit }) {
@@ -30,3 +30,4 @@ export default {
   mutations,
   actions
 }
+

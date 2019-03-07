@@ -38,12 +38,12 @@
           <span v-else>最新在前</span>
         </a>
 
-        <div v-for="(item, pos) in replyData.replys" class="reply-to-reply-item">
+        <div v-for="(item, pos) in replyData.replys" class="reply-to-reply-item" :key="pos">
           <!-- 回复人用户名 -->
           <router-link :to="'/home/user/' + item.username">
             {{ item.username }}
           </router-link>
-          <span style="margin: 0 5px"> : </span> 
+          <span style="margin: 0 5px"> : </span>
           <!-- 回复内容    -->
           {{ item.content }}
           <!-- 回复时间， 浅灰 -->
@@ -266,8 +266,8 @@ export default {
 
 // 删除按钮
 .delete-link {
-  float: right; 
-  margin-right: 10px; 
+  float: right;
+  margin-right: 10px;
   color: #ed4014;
   transition: opacity .2s;
 }

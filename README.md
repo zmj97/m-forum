@@ -202,3 +202,7 @@ This project was generated with [electron-vue](https://github.com/SimulatedGREG/
 111	111@qq.com		111111
 
 222	222@qq.com		222222
+
+
+server2 测试用密码：
+user1	111@qq.com	111111

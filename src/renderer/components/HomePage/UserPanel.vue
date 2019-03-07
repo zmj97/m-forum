@@ -1,5 +1,5 @@
 <template>
-  <!-- 左中右分别为用户信息、所加入小组　和　所发帖子 -->
+  <!-- 左中右分别为用户信息、所加入小组 和 所发帖子 -->
   <div style="overflow: auto">
     <!-- 用户信息 -->
     <Col :xs="24" :sm="6" class="info-side">
@@ -30,8 +30,8 @@
     <!-- 用户加入的小组 -->
     <Col :xs="{ span: 24}" :sm="{ span: 6, offset: 2 }">
       <Icon type="ios-people" size="30" style="margin: 10px"></Icon>所在小组
-      <div v-show="groups.length > 0">
-        <div v-for="item in groups">
+      <div v-show="groups && groups.length > 0">
+        <div v-for="item in groups" :key="item.name">
           <router-link :to="'/home/group/' + item.name">
             <Card class="card-margin">
               <p slot="title">{{ item.name }}</p>
@@ -45,7 +45,7 @@
           </router-link>
         </div>
       </div>
-      <div v-if="groups.length === 0">
+      <div v-if="!groups || groups.length === 0">
         该用户暂未加入小组！
       </div>
     </Col>
@@ -53,10 +53,11 @@
     <!-- 用户发过的帖子 -->
     <Col :xs="24" :sm="{ span: 6, offset: 2 }">
       <Icon type="ios-paper" size="25" style="margin: 10px"></Icon>所有帖子
-      <div v-if="posts.length > 0">
+      <div v-if="posts && posts.length > 0">
         <list-item
          v-for="(item, index) in posts"
          :itemData="item"
+         :key="index"
          @click.native="showPostMethod(index)"
          class="card-margin"
         ></list-item>
@@ -71,7 +72,7 @@
 
     <!-- 帖子弹窗 -->
     <transition name="fade">
-      <post-modal v-show="showPost" :posts="posts" :pos="postPos" @close="closePost"></post-modal>
+      <post-modal v-if="posts && posts.length > postPos" v-show="showPost" :posts="posts" :pos="postPos" @close="closePost"></post-modal>
     </transition>
   </div>
 </template>
@@ -131,7 +132,7 @@ export default {
         // 获取小组数据
         if (data.groups.length > 0) {
           this.getGroupData(data.groups, groupsData => {
-            this.groups = groupsData
+            this.groups.push(...groupsData)
           })
         }
       })

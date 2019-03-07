@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import store from '../store/'
 
 Vue.use(Router)
 
@@ -18,7 +19,6 @@ const router = new Router({
     {
       // 主页
       path: '/home',
-      name: 'home-page',
       component: require('@/components/HomePage').default,
       children: [
         {
@@ -77,13 +77,18 @@ const router = new Router({
     },
     {
       path: '*',
-      redirect: '/'
+      redirect: '/home'
     }
   ]
 })
 
 router.beforeEach((to, from, next) => {
   if (window.localStorage.username) {
+    if (store.state.Users.currentUser.username === '') {
+      store.dispatch('setUser', {
+        username: window.localStorage.username
+      })
+    }
     next()
   } else if (to.path !== '/welcome') {
     Vue.prototype.$Message.error('检测到您还未登陆，请先登录')

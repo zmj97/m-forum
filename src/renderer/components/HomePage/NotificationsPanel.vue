@@ -7,7 +7,7 @@
             <Icon type="ios-trash" size="24" />清空消息
           </span>
         </div>
-        <Card v-for="item in applyNotifications" :bordered="false" class="card-panel">
+        <Card v-for="(item, index) in applyNotifications" :bordered="false" class="card-panel" :key="index">
           <p slot="title">加入小组申请</p>
           <Button @click="acceptApply(item.username, item.groupName)" slot="extra" type="success" class="buttons">同意</Button>
           <Button @click="refuseApply(item.username, item.groupName)" slot="extra" type="error" class="buttons">拒绝</Button>
@@ -26,7 +26,7 @@
             <Icon type="ios-trash" size="24" />清空消息
           </span>
         </div>
-        <Card v-for="item in resultNotifications" :bordered="false" class="card-panel">
+        <Card v-for="(item, index) in resultNotifications" :bordered="false" class="card-panel" :key="index">
           <p slot="title">申请结果</p>
           <p>
             你向
@@ -53,16 +53,18 @@
             <Icon type="ios-trash" size="24" />清空消息
           </span>
         </div>
-        <Card 
-         :bordered="false" 
-         class="card-panel" 
-         v-for="item in replyNotifications">
+        <Card
+         :bordered="false"
+         class="card-panel"
+         v-for="(item, index) in replyNotifications"
+         :key="index"
+        >
           <p slot="title">{{ item.username }} 回复了你</p>
           <a slot="extra" @click="toPostPanel(item.postId, item.replyIndex)">点击查看</a>
           <p>
-            <span class="bold-font">{{ item.username }}</span> 
-            在帖子 
-            <span class="bold-font">{{ item.title }}</span> 
+            <span class="bold-font">{{ item.username }}</span>
+            在帖子
+            <span class="bold-font">{{ item.title }}</span>
             中回复了你，快去查看吧！ </p>
         </Card>
       </div>

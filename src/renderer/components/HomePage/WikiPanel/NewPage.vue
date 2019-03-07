@@ -1,11 +1,11 @@
 <template>
   <div style="overflow: auto">
     <!-- 标题栏 -->
-    <input 
-     id="title" 
-     type="text" 
-     name="title" 
-     v-model="wikiData.title" 
+    <input
+     id="title"
+     type="text"
+     name="title"
+     v-model="wikiData.title"
      placeholder="标题，最多输入30个字符"
      :maxlength=30
     >
@@ -14,7 +14,7 @@
     <section v-if="!isEdit">
       <h3 class="hint">限定小组(仅限定小组的成员可浏览与编辑)</h3>
       <Select
-       v-model="wikiData.groups" 
+       v-model="wikiData.groups"
        multiple
        clearable
        placeholder="可选择要限定的小组(多选)"
@@ -22,7 +22,7 @@
        style="width: auto;z-index: 499;"
        class="set-groups"
       >
-        <Option 
+        <Option
          v-for="group in allGroups"
          :value="group.name"
          :key="group.name"
@@ -32,24 +32,23 @@
       </Select>
     </section>
 
-
     <h3 class="hint">编辑内容</h3>
     <mathjax-toolbar contentId="editor"></mathjax-toolbar>
     <!-- ishljs 为 是否开启代码高亮 -->
     <!-- 支持mathjax -->
     <mavon-editor
      id="editor"
-     v-model="wikiData.lastestVersion.content" 
+     v-model="wikiData.lastestVersion.content"
      :ishljs="true"
     />
 
     <h3 class="hint">编辑信息</h3>
-    <Input 
+    <Input
      id="editMessage"
-     v-model="wikiData.lastestVersion.editMessage" 
-     size="large" 
+     v-model="wikiData.lastestVersion.editMessage"
+     size="large"
      placeholder="最多输入100个字符"
-     clearable 
+     clearable
      :maxlength=100
     />
 

@@ -75,7 +75,7 @@
 
         </Dropdown>
       </MenuItem>
-      
+
       <MenuItem name="1" to="/home/home" style="-webkit-app-region: no-drag">
         <Icon type="ios-home" />
         主页
@@ -95,7 +95,6 @@
         <Icon type="ios-book" />
         Wiki
       </MenuItem>
-
 
       <Input v-model="searchStr" @on-enter="search()" suffix="ios-search" placeholder="搜索" class="search-bar" style="-webkit-app-region: no-drag" />
 
@@ -142,7 +141,7 @@ export default {
 
     // 更新菜单高亮状态
     updateMenu () {
-      var path = this.$route.matched[1].path
+      const path = this.$route.matched[1].path
       if (path.indexOf('/home/home') !== -1) {
         this.menuActive = '1'
       } else if (path.indexOf('group') !== -1) {

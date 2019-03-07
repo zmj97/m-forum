@@ -30,6 +30,7 @@ axios.defaults.baseURL = 'http://172.26.73.221:3000'
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
+process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 Vue.http = Vue.prototype.$http = axios
 Vue.config.productionTip = false
 

@@ -3,25 +3,10 @@ exports.install = function (Vue, options) {
 
   // 获取指定的一些用户的数据
   proto.getUserData = function (names, callback, falseCallback = () => {}) {
-    /*
-     * usernames:
-     * 一个username(string), 或：
-     * [{'username': username0}, {'username': username1}, ....]
-     */
-    let usernames
-    if (typeof names === 'string') {
-      usernames = names
-    } else {
-      usernames = []
-      names.forEach(function (name) {
-        usernames.push({'username': name})
-      })
-    }
-
     // 获取用户数据
-    this.$http.post('/user/find/data', {'username': usernames})
+    this.$http.post('/user/find/data', {'username': names})
       .then((res) => {
-        if (res.data !== false) {
+        if (res.data !== false && res.data !== 'error') {
           callback(res.data)
         } else {
           falseCallback()

@@ -11,10 +11,10 @@
     <!-- 支持mathjax -->
     <!-- 作者停止更新，无法关闭autofocus -->
     <!-- 默认z-index过大，调整为500， 在全屏时再修改z-index -->
-    <mavon-editor 
-     id="md-editor" 
+    <mavon-editor
+     id="md-editor"
      v-model="value"
-     :ishljs="true" 
+     :ishljs="true"
      :scrollStyle="true"
      :autofocus="false"
      style="z-index: 500"

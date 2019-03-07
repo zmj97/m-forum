@@ -20,14 +20,14 @@
       </Modal>
 
       <Select
-       v-model="group" 
+       v-model="group"
        clearable
        placeholder="可选择要限定的小组"
        not-found-text="您还未加入小组"
        style="width: auto;"
        class="float-right"
       >
-        <Option 
+        <Option
          v-for="group in joinedGroups"
          :value="group"
          :key="group"
@@ -38,28 +38,28 @@
     </div>
 
     <!-- 标题栏 -->
-    <input 
-     id="title" 
-     type="text" 
-     name="title" 
-     v-model="postData.title" 
+    <input
+     id="title"
+     type="text"
+     name="title"
+     v-model="postData.title"
      placeholder="标题，最多输入30个字符"
      :maxlength=30
     >
 
     <!-- 摘要栏 -->
-    <Input 
+    <Input
      id="abstract"
-     v-model="postData.abstract" 
-     size="large" 
+     v-model="postData.abstract"
+     size="large"
      placeholder="摘要，最多输入100个字符"
-     clearable 
+     clearable
      :maxlength=100
     />
 
     <!-- 添加标签 -->
     <div id="tags">
-      <Tag 
+      <Tag
        type="dot"
        color="primary"
        v-for="tag in postData.tags"
@@ -67,11 +67,13 @@
        :name="tag"
        closable
        @on-close="removeTag"
-      >{{ tag }}</Tag>
+      >
+        {{ tag }}
+      </Tag>
 
       <Input
-       placeholder="回车添加标签，至多10个" 
-       prefix="ios-pricetag" 
+       placeholder="回车添加标签，至多10个"
+       prefix="ios-pricetag"
        style="width: 180px"
        v-model="newTag"
        @on-enter="addTag"
@@ -84,7 +86,7 @@
     <!-- 支持mathjax -->
     <mavon-editor
      id="editor"
-     v-model="postData.content" 
+     v-model="postData.content"
      :ishljs="true"
     />
   </div>
@@ -125,7 +127,9 @@ export default {
     },
 
     addTag () {
-      if (this.postData.tags.length < 10 && this.newTag !== '') {
+      if (this.postData.tags.indexOf(this.newTag) !== -1) {
+        this.$Message.warning('标签不可重复！')
+      } else if (this.postData.tags.length < 10 && this.newTag !== '') {
         this.postData.tags.push(this.newTag)
         this.newTag = ''
       }
@@ -159,7 +163,7 @@ export default {
     }
   },
 
-  created () {
+  mounted () {
     this.getJoinedGroups(this.postData.username, this.joinedGroups)
   }
 }

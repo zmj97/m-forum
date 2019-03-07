@@ -79,7 +79,7 @@
         <p style="margin: 1rem 0">所有成员：</p>
         <!-- 所有成员图标 -->
         <!-- 文字提示气泡框，提示名字 -->
-        <Tooltip v-for="(item, index) in users" :content="item" style="margin: 3px">
+        <Tooltip v-for="(item, index) in users" :content="item" style="margin: 3px" :key="index">
           <router-link :to="'/home/user/' + item">
             <m-avatar
              :avatar="avatars[index]"
@@ -101,6 +101,7 @@
         <list-item
          v-for="(item, index) in posts"
          :itemData="item"
+         :key="index"
          @click.native="showPostMethod(index)"
          class="card-margin"
         ></list-item>
