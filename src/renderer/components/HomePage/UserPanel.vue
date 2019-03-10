@@ -2,7 +2,7 @@
   <!-- 左中右分别为用户信息、所加入小组 和 所发帖子 -->
   <div style="overflow: auto">
     <!-- 用户信息 -->
-    <Col :xs="24" :sm="6" class="info-side">
+    <Col :sm="24" :md="6" class="info-side">
       <m-avatar
        :avatar="userData.avatar"
        :size=3
@@ -17,18 +17,45 @@
         <Icon v-if="userData.gender === 'female'" type="ios-female" style="color: pink; font-weight: bold" />
         <Icon v-else-if="userData.gender === 'male'" type="ios-male" style="color: blue; font-weight: bold" />
       </h1>
-      <div v-if="userData.email">
-        <Icon type="ios-mail"></Icon>
-        {{ userData.email }}
-      </div>
       <div v-if="userData.telephone">
         <Icon type="ios-phone-portrait" />
         {{ userData.telephone }}
       </div>
+      <div v-if="userData.email">
+        <Icon type="ios-mail"></Icon>
+        {{ userData.email }}
+      </div>
     </Col>
 
+    <!-- 选项链接 -->
+    <div style="padding: 20px; text-align: center; letter-spacing: 1px;" class="hideInPc">
+      <span>
+        <router-link to="/home/star">
+          我的收藏
+        </router-link>
+      </span>
+
+      <span>
+        <router-link to="/home/notifications">
+          我的消息
+        </router-link>
+      </span>
+
+      <span>
+        <router-link to="/home/edit">
+          账号设置
+        </router-link>
+      </span>
+
+      <span>
+        <router-link to="/welcome" @click.native="logout">
+          退出登录
+        </router-link>
+      </span>
+    </div>
+
     <!-- 用户加入的小组 -->
-    <Col :xs="{ span: 24}" :sm="{ span: 6, offset: 2 }">
+    <Col :sm="{ span: 24}" :md="{ span: 6, offset: 2 }">
       <Icon type="ios-people" size="30" style="margin: 10px"></Icon>所在小组
       <div v-show="groups && groups.length > 0">
         <div v-for="item in groups" :key="item.name">
@@ -40,7 +67,7 @@
                   {{ item.leader }}
                 </router-link>
               </p>
-              <p>{{ item.intro }}</p>
+              <p style="color: #808695">{{ item.intro }}</p>
             </Card>
           </router-link>
         </div>
@@ -51,7 +78,7 @@
     </Col>
 
     <!-- 用户发过的帖子 -->
-    <Col :xs="24" :sm="{ span: 6, offset: 2 }">
+    <Col :sm="24" :md="{ span: 6, offset: 2 }">
       <Icon type="ios-paper" size="25" style="margin: 10px"></Icon>所有帖子
       <div v-if="posts && posts.length > 0">
         <list-item
@@ -85,6 +112,8 @@ export default {
 
   name: 'UserPanel',
 
+  inject: ['reload'],
+
   components: {
     PostModal,
     ListItem
@@ -108,6 +137,12 @@ export default {
   computed: {
     username () {
       return this.$route.params.name
+    }
+  },
+
+  watch: {
+    username () {
+      this.reload()
     }
   },
 
@@ -176,5 +211,9 @@ export default {
 .card-margin {
   /* width: 80%; */
   margin-bottom: 10px;
+}
+
+@media screen and (min-width: 768px) {
+  .hideInPc {display: none;}
 }
 </style>

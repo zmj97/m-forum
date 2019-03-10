@@ -1,6 +1,6 @@
 <template>
   <div style="overflow: auto">
-    <Col :xs="24" :sm="6" style="padding: 1rem">
+    <Col :sm="24" :md="8" style="padding: 1rem">
       <div style="text-align: center; padding: 1rem 0;">
         <!-- 小组头像 -->
         <m-avatar
@@ -95,7 +95,7 @@
       </div>
     </Col>
 
-    <Col :xs="24" :sm="{ span: 8, offset: 5 }">
+    <Col :sm="24" :md="{ span: 8, offset: 4 }">
       <Icon type="ios-paper" size="25" style="margin: 10px"></Icon>小组内所有帖子
       <div v-if="posts.length > 0">
         <list-item

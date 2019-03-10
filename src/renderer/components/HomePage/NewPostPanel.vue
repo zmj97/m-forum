@@ -59,17 +59,20 @@
 
     <!-- 添加标签 -->
     <div id="tags">
-      <Tag
-       type="dot"
-       color="primary"
-       v-for="tag in postData.tags"
-       :key="tag"
-       :name="tag"
-       closable
-       @on-close="removeTag"
-      >
-        {{ tag }}
-      </Tag>
+      <span>
+        <!-- 使用span单独框起来，来fix刷新后标签不显示的问题 -->
+        <Tag
+         type="dot"
+         color="primary"
+         v-for="tag in postData.tags"
+         :key="tag"
+         :name="tag"
+         closable
+         @on-close="removeTag"
+        >
+          {{ tag }}
+        </Tag>
+      </span>
 
       <Input
        placeholder="回车添加标签，至多10个"
@@ -88,6 +91,8 @@
      id="editor"
      v-model="postData.content"
      :ishljs="true"
+     :scrollStyle="true"
+     ref=md @imgAdd="$imgAdd" @imgDel="$imgDel"
     />
   </div>
 </template>
@@ -116,7 +121,20 @@ export default {
 
       // 对话框
       modalPost: false,
-      modalCancel: false
+      modalCancel: false,
+
+      // 编辑器中添加的图片
+      imgFiles: {}
+      /*
+        imgFiles:
+        {
+          pos('0','1', ...):
+            {
+              miniurl:
+              _name:
+            }
+        }
+       */
     }
   },
 
@@ -135,7 +153,17 @@ export default {
       }
     },
 
-    okPost () {
+    // 绑定@imgAdd event
+    $imgAdd (pos, $file) {
+      // 缓存图片信息
+      this.imgFiles[pos] = $file
+    },
+
+    $imgDel (pos) {
+      delete this.imgFiles[pos]
+    },
+
+    async okPost () {
       if (this.postData.title.replace(/\s+/g, '').length === 0) {
         return this.$Message.error('标题内容不能为空！')
       }
@@ -145,6 +173,27 @@ export default {
       // 如果设定了小组
       if (this.group) {
         this.postData.group = this.group
+      }
+
+      // 第一步.将图片上传到服务器.
+      if (this.imgFiles !== {}) {
+        await this.$http.post('/statics/upload', this.imgFiles)
+          .then((res) => {
+            /**
+             * 返回数据为 res = [[pos, url], [pos, url]...]
+             * pos 为原图片标志（0）
+             * url 为上传后图片的url地址
+             *
+             * $vm.$img2Url(>=2.1.11)
+             * String: filename, String: url
+             * 将md源码中图片文件名替换为url
+             * 如![h](./0) ->
+             * ![h](http://path/to/png/some.png)
+             */
+            res.data.forEach(img => {
+              this.$refs.md.$img2Url(img[0], img[1])
+            })
+          })
       }
 
       this.$http.post('/post/create/new', this.postData)

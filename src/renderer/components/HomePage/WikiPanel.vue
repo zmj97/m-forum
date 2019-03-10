@@ -100,7 +100,7 @@
         </div>
 
         <!-- content -->
-        <article id="content" v-html="convertedContent"></article>
+        <article id="content" class="content-list" v-html="convertedContent"></article>
       </div>
 
       <!-- 所有page目录 -->
@@ -244,7 +244,16 @@ export default {
       if (!this.page || !this.page.lastestVersion.content) {
         return ''
       }
-      return mavonEditor.getMarkdownIt().render(this.page.lastestVersion.content)
+      let result = mavonEditor.getMarkdownIt().render(this.page.lastestVersion.content)
+      // 调整图片最大宽度为100%
+      // style 插在img标签 与 src 之间
+      let imgPos = result.indexOf('<img src=')
+      const imgStyle = 'style="display: block;max-width: 100%;" '
+      while (imgPos !== -1) {
+        result = result.slice(0, imgPos + 5) + imgStyle + result.slice(imgPos + 5)
+        imgPos = result.indexOf('<img src=')
+      }
+      return result
     }
   },
 
@@ -335,7 +344,9 @@ export default {
   }
 }
 
-#content {padding: 24px 0;}
+#content {
+  padding: 24px 0;
+}
 
 .nav {
   padding: 0 10px;

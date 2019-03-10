@@ -28,7 +28,7 @@ class Group {
 
   async searchGroups (searchStr) {
     let searchResult = []
-    const groups = GroupModel.find()
+    const groups = await GroupModel.find()
     groups.forEach(item => {
       if (item.name.indexOf(searchStr) !== -1
        || item.intro.indexOf(searchStr) !== -1) {
@@ -194,7 +194,7 @@ class Group {
             'groupName': req.body.name
           }
         }}),
-        UserModel.findOneAndUpdate({'username': req.body.leader}, {
+        UserModel.findOneAndUpdate({'username': req.body.username}, {
           // 更新成员的已加入小组
           $addToSet: {'groups': req.body.name},
           // 为用户添加结果通知
@@ -224,7 +224,7 @@ class Group {
             'groupName': req.body.name
           }
         }}),
-        UserModel.findOneAndUpdate({'username': req.body.leader}, {
+        UserModel.findOneAndUpdate({'username': req.body.username}, {
           // 为用户添加结果通知
           $push: {'resultNotifications': {
             'groupName': req.body.name,

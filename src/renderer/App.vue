@@ -5,6 +5,8 @@
 </template>
 
 <script>
+const shell = require('electron').shell
+
 export default {
   name: 'm-forum',
 
@@ -28,14 +30,29 @@ export default {
         this.routerIsAlive = true
       })
     }
+  },
+
+  mounted () {
+    // 使用本地默认打开软件打开链接、文件、文件夹等
+    window.addEventListener('click', function (event) {
+      const link = event.path.find($el => {
+        if ($el.tagName === 'A' && $el.href.indexOf('http://localhost') === -1 && ($el.href.startsWith('http') || $el.href.startsWith('file'))) {
+          return true
+        }
+        return false
+      })
+      if (link) {
+        event.preventDefault()
+        shell.openExternal(link.href)
+      }
+    })
   }
 }
 </script>
 
 <style>
-pre {
-  font-family: "Arial", "Microsoft YaHei", "黑体", sans-serif;
-  white-space: pre-wrap;
+.content-list li {
+  margin-left: 15px;
 }
 
 /* 滚动条样式 */

@@ -6,6 +6,7 @@ const router = express.Router()
 const fs = require('fs')
 const path = require('path')
 const md5 = require('md5-node')
+const config = require('../../config/index')
 
 // 获取mime类型
 const mimeModel = require('../models/mime')
@@ -32,7 +33,7 @@ router.get('*', function (req, res) {
   })
 })
 
-const url = 'http://172.26.73.221:3000/statics/'
+const url = 'http://'+ config.ip + '/statics/'
 router.post('/upload', function (req, res) {
    // 保存图片
    // 返回[[pos, url], [pos, url]...]

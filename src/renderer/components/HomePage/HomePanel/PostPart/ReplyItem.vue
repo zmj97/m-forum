@@ -11,11 +11,13 @@
     </router-link>
 
     <!-- 回复人的用户名，可点击跳转到回复人的主页 -->
-    <router-link :to="'/home/user/' + replyData.username">
-      <h4>{{ replyData.username }}</h4>
-    </router-link>
+    <h4>
+      <router-link :to="'/home/user/' + replyData.username">
+        {{ replyData.username }}
+      </router-link>
+    </h4>
     <!-- 回复的内容，支持markdown和mathjax -->
-    <div v-html="convertedContent"></div>
+    <div v-html="convertedContent" class="content-list"></div>
     <!-- 相关信息 -->
     <p class="little-gray">
       <!-- 回复时间 -->
@@ -118,7 +120,16 @@ export default {
   computed: {
     // 转换内容到markdown格式
     convertedContent () {
-      return mavonEditor.getMarkdownIt().render(this.replyData.content)
+      let result = mavonEditor.getMarkdownIt().render(this.replyData.content)
+      // 调整图片最大宽度为100%
+      // style 插在img标签 与 src 之间
+      let imgPos = result.indexOf('<img src=')
+      const imgStyle = 'style="display: block;max-width: 100%;" '
+      while (imgPos !== -1) {
+        result = result.slice(0, imgPos + 5) + imgStyle + result.slice(imgPos + 5)
+        imgPos = result.indexOf('<img src=')
+      }
+      return result
     }
   },
 

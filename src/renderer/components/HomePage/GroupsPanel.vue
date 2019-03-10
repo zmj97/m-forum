@@ -2,7 +2,7 @@
   <div>
     <Tabs :animated="true" type="card" v-model="tabName">
       <TabPane label="已加入" name="已加入" id="joined">
-        <Col :xs="12" :sm="6" :md="4" :lg="3" v-for="item in joined" :key="item.name">
+        <Col :xs="12" :sm="6" :lg="4" v-for="item in joined" :key="item.name">
           <router-link :to="'/home/group/' + item.name">
             <Card class="group">
               <p slot="title">{{ item.name }}</p>
@@ -11,13 +11,13 @@
                   {{ item.leader }}
                 </router-link>
               </p>
-              <p>{{ item.intro }}</p>
+              <p style="color: #808695">{{ item.intro }}</p>
             </Card>
           </router-link>
         </Col>
       </TabPane>
       <TabPane label="全部">
-        <Col :xs="12" :sm="6" :md="4" :lg="3" v-for="item in groups" :key="item.name">
+        <Col :xs="12" :sm="6" :lg="4" v-for="item in groups" :key="item.name">
           <router-link :to="'/home/group/' + item.name">
             <Card class="group">
               <p slot="title">{{ item.name }}</p>
@@ -26,7 +26,7 @@
                   {{ item.leader }}
                 </router-link>
               </p>
-              <p>{{ item.intro }}</p>
+              <p style="color: #808695">{{ item.intro }}</p>
             </Card>
           </router-link>
         </Col>

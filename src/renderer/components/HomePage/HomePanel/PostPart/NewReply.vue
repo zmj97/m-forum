@@ -86,7 +86,6 @@ export default {
 
     uploadReply ($e) {
       // 第一步.将图片上传到服务器.
-      // }
       this.$http.post('/statics/upload', this.imgFiles)
         .then((res) => {
           /**

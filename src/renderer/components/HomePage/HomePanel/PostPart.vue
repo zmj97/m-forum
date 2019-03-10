@@ -64,17 +64,15 @@
     <p v-else class="no-reply">快来当第一个回复的人吧！</p>
 
     <!-- 添加回复 -->
-    <transition name="fade">
-      <section v-if="showNewReply" id="new-reply">
-        <!-- 传递帖子id、标题和帖子的发帖人 -->
-        <new-reply
-         :_id="postDataFinal._id"
-         :title="postDataFinal.title"
-         :username="postDataFinal.username"
-         @appendReply="appendDataToReply"
-        ></new-reply>
-      </section>
-    </transition>
+    <section id="new-reply">
+      <!-- 传递帖子id、标题和帖子的发帖人 -->
+      <new-reply
+       :_id="postDataFinal._id"
+       :title="postDataFinal.title"
+       :username="postDataFinal.username"
+       @appendReply="appendDataToReply"
+      ></new-reply>
+    </section>
 
     <!-- 功能键 -->
     <transition name="fade">
@@ -100,7 +98,7 @@
 
         <!-- 回复 -->
         <Tooltip content="回复">
-          <a href="#new-reply" @click="showNewReply = !showNewReply">
+          <a href="#new-reply">
             <Icon type="ios-text" />
           </a>
         </Tooltip>
@@ -163,9 +161,7 @@ export default {
       // 当前用户收藏的所有帖子id
       stars: [],
       // 是否显示返回按钮，在全屏显示时显示
-      showBack: false,
-      // 是否显示回复面板
-      showNewReply: false
+      showBack: false
     }
   },
 
@@ -197,7 +193,16 @@ export default {
 
     // 将content转换为对应的markdown显示
     convertedContent () {
-      return mavonEditor.getMarkdownIt().render(this.postDataFinal.content)
+      let result = mavonEditor.getMarkdownIt().render(this.postDataFinal.content)
+      // 调整图片最大宽度为100%
+      // style 插在img标签 与 src 之间
+      let imgPos = result.indexOf('<img src=')
+      const imgStyle = 'style="display: block;max-width: 100%;" '
+      while (imgPos !== -1) {
+        result = result.slice(0, imgPos + 5) + imgStyle + result.slice(imgPos + 5)
+        imgPos = result.indexOf('<img src=')
+      }
+      return result
     }
   },
 
@@ -286,13 +291,16 @@ export default {
       this.$router.back(-1)
     },
 
-    // 提交新的回复时，将新的数据push到postDataFinal.replys中
+    // 提交新的回复时，无闪烁刷新并闪烁提示添加的回复
     appendDataToReply (data) {
-      this.postDataFinal.replys.push(data)
-      // 并跳转闪烁
-      let replyId = 'reply-' + (this.postDataFinal.replys.length - 1).toString()
-      window.location.hash = '#' + replyId
-      setTimeout(() => { this.hintReply(replyId, 5) }, 0)
+      // this.postDataFinal.replys.push(data)
+      let replyId = 'reply-' + this.postDataFinal.replys.length
+      this.reload()
+      setTimeout(() => {
+        // 并跳转闪烁
+        window.location.hash = '#' + replyId
+        this.hintReply(replyId, 5)
+      }, 100)
     },
 
     // 利用query传入的帖子id可能不存在
@@ -399,7 +407,7 @@ export default {
 #fix-menu {
   position: fixed;
   width: 25px;
-  top: 60%;
+  bottom: 10%;
   right: 1rem;
   font-size: 1.5rem;
   color: #19be6b;
@@ -442,6 +450,11 @@ export default {
   text-align: center;
 }
 
+// 帖子内容
+#content {
+  overflow-x: auto;
+}
+
 // 新的回复
 #new-reply {
   background-color: #eee;
@@ -464,6 +477,12 @@ export default {
     .buttons {
       top: 260px;
     }
+  }
+
+  #fix-menu {
+    // 触屏使用时按钮增大，防止按不到
+    font-size: 2rem;
+    line-height: 1.5;
   }
 }
 

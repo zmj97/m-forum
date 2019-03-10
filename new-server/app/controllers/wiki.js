@@ -14,7 +14,7 @@ class Wiki {
 
   async searchWikis (searchStr) {
     let searchResult = []
-    const wikis = WikiModel.find()
+    const wikis = await WikiModel.find()
     wikis.forEach(item => {
       if (item.title.indexOf(searchStr) !== -1
        || item.lastestVersion.content.indexOf(searchStr) !== -1) {
@@ -71,7 +71,7 @@ class Wiki {
 
   async searchByStr (req, res) {
     try {
-      return res.send(await searchByStr(req.body.searchStr))
+      return res.send(await this.searchWikis(req.body.searchStr))
     } catch (err) {
       console.log('searchByStr() Failed: ', err)
       return res.send('error')
@@ -108,11 +108,45 @@ class Wiki {
   }
 
   // 需要外网可访问
-  // http://172.26.73.221:3000/wiki/update/hooks
+  // http://120.79.144.82/wiki/update/hooks
   async hooks (req, res) {
     try {
-      console.log(req.body)
-      return res.send('hooks连接成功！')
+			const data = JSON.parse(JSON.stringify(req.body))
+      const repo = data.repository
+      const repoName = repo.name
+      const updateDate = new Date(repo.updated_at)
+      const sender = data.sender
+      const commit = data.commits[0]
+
+      // 检查page是否存在
+      // 标题为仓库名字
+      const page = await WikiModel.findOne({'title': repoName})
+      // 要更新的内容
+      const newVersion = {
+        username: sender.login,
+        time: updateDate,
+        content: (page ? page.lastestVersion.content : '') + `[${sender.login}](${sender.html_url}) 在 ${updateDate.toLocaleString()} 提交了 [${commit.id.slice(0,7)}](${commit.url}) :
+${commit.message}
+`,
+        editMessage: `webhooks: ${commit.message}`
+      }
+      if (!page) {
+        // 不存在则新增page
+        await WikiModel.create({
+          title: repoName,
+          lastestVersion: newVersion,
+          allVersions: [newVersion],
+          groups: []
+        })
+      } else {
+        // 存在则在尾部追加
+        await WikiModel.findOneAndUpdate({'title': repoName}, {
+          $set: {lastestVersion: newVersion},
+          $push: {allVersions: newVersion}
+        })
+      }
+
+			return res.send('hooks连接成功！')
     } catch (err) {
       console.log('hooks() Failed: ', err)
       return res.send('error')

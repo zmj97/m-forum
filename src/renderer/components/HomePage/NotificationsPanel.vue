@@ -11,7 +11,16 @@
           <p slot="title">加入小组申请</p>
           <Button @click="acceptApply(item.username, item.groupName)" slot="extra" type="success" class="buttons">同意</Button>
           <Button @click="refuseApply(item.username, item.groupName)" slot="extra" type="error" class="buttons">拒绝</Button>
-          <p>用户 {{ item.username }} 申请加入您管理的小组 {{ item.groupName }}</p>
+          <p>
+            用户
+            <router-link :to="'/home/user/' + item.username">
+              {{ item.username }}
+            </router-link>
+            申请加入您管理的小组
+            <router-link :to="'/home/group/' + item.groupName">
+              {{ item.groupName }}
+            </router-link>
+          </p>
         </Card>
       </div>
       <p v-else style="text-align: center">

@@ -25,7 +25,7 @@ Vue.use(iView)
 Vue.use(mavonEditor)
 
 // 修改全局axios默认值
-axios.defaults.baseURL = 'http://172.26.73.221:3000'
+axios.defaults.baseURL = 'http://120.79.144.82'
 // axios.defaultsaxios.defaults.headers.common['Authorization'] = AUTH_TOKEN
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 

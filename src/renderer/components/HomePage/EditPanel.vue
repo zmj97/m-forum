@@ -68,31 +68,36 @@ export default {
       document.getElementById('inputFile').click()
     },
 
-    submitChange () {
-      let reader = new FileReader()
-      reader.readAsDataURL(this.img)
-      reader.onload = e => {
-        // 获取图片数据， 保存在e.target.result中
-        this.$http.post('/statics/upload-avatar', {
-          'username': this.username,
-          '_name': this.img.name,
-          'miniurl': e.target.result
-        }).then(res => {
-          this.formItem.avatar = res.data
-          this.$http.post('/user/update/info', {'username': this.username, 'formdata': this.formItem})
-            .then(res => {
-              console.log(res.data)
-              if (res.data === 'success') {
-                this.$Message.success('修改成功')
-                this.$router.push('/home/user/' + this.username)
-                // 由于保存文件名不变无法刷新头像，待解决
-                location.reload()
-                // this.reload()
-              } else {
-                this.$Message.error('修改失败')
-              }
-            })
+    uploadFormData () {
+      this.$http.post('/user/update/info', {'username': this.username, 'formdata': this.formItem})
+        .then(res => {
+          if (res.data === 'success') {
+            this.$Message.success('修改成功')
+            this.$router.push('/home/user/' + this.username)
+            this.reload()
+          } else {
+            this.$Message.error('修改失败')
+          }
         })
+    },
+
+    submitChange () {
+      if (this.img) {
+        let reader = new FileReader()
+        reader.readAsDataURL(this.img)
+        reader.onload = e => {
+          // 获取图片数据， 保存在e.target.result中
+          this.$http.post('/statics/upload-avatar', {
+            'username': this.username,
+            '_name': this.img.name,
+            'miniurl': e.target.result
+          }).then(res => {
+            this.formItem.avatar = res.data
+            this.uploadFormData()
+          })
+        }
+      } else {
+        this.uploadFormData()
       }
     }
   },
@@ -139,7 +144,8 @@ export default {
 }
 
 #edit-form {
-  width: 500px;
+  max-width: 500px;
   margin: 1rem auto;
+  padding-right: 1rem;
 }
 </style>

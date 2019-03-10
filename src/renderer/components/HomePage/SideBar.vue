@@ -1,7 +1,7 @@
 <template>
   <!-- 可拖动 -->
   <nav id="toolbar" style="-webkit-app-region: drag">
-    <Menu :mode="menuMode" width="118px" :active-name="menuActive" class="menu">
+    <Menu mode="horizontal" :active-name="menuActive" class="menu">
 
       <!-- 窗口选项： 关闭、最大化、最小化 -->
       <div class="window-buttons" style="-webkit-app-region: no-drag">
@@ -28,7 +28,7 @@
         />
       </div>
 
-      <MenuItem name="6" style="-webkit-app-region: no-drag">
+      <MenuItem name="6" style="-webkit-app-region: no-drag" class="user-large">
         <Dropdown :transfer=true>
 
           <router-link href="javascript:void(0)" :to="'/home/user/' + username">
@@ -76,24 +76,37 @@
         </Dropdown>
       </MenuItem>
 
-      <MenuItem name="1" to="/home/home" style="-webkit-app-region: no-drag">
+      <MenuItem name="0" style="-webkit-app-region: no-drag" class="user-small" :to="'/home/user/' + username">
+        <m-avatar
+         :avatar="avatar"
+         :size=1
+        ></m-avatar>
+        <Badge v-if="hasNewNt" dot style="position: fixed; left: 43px; bottom: 40px;"></Badge>
+      </MenuItem>
+
+      <MenuItem name="1" to="/home/home" style="-webkit-app-region: no-drag" class="menu-item">
         <Icon type="ios-home" />
         主页
       </MenuItem>
 
-      <MenuItem name="2" to="/home/groups" style="-webkit-app-region: no-drag">
+      <MenuItem name="2" to="/home/groups" style="-webkit-app-region: no-drag" class="menu-item">
         <Icon type="ios-people" />
         小组
       </MenuItem>
 
-      <MenuItem name="3" to="/home/new-post" style="-webkit-app-region: no-drag">
+      <MenuItem name="3" to="/home/new-post" style="-webkit-app-region: no-drag" class="menu-item">
         <Icon type="ios-paper" />
         发帖
       </MenuItem>
 
-      <MenuItem name="4" to="/home/wiki" style="-webkit-app-region: no-drag">
+      <MenuItem name="4" to="/home/wiki" style="-webkit-app-region: no-drag" class="menu-item">
         <Icon type="ios-book" />
         Wiki
+      </MenuItem>
+
+      <MenuItem name="5" to="/home/search" style="-webkit-app-region: no-drag" class="menu-item search-button">
+        <Icon type="ios-search" />
+        搜索
       </MenuItem>
 
       <Input v-model="searchStr" @on-enter="search()" suffix="ios-search" placeholder="搜索" class="search-bar" style="-webkit-app-region: no-drag" />
@@ -120,9 +133,7 @@ export default {
       username: this.$store.state.Users.currentUser.username,
       avatar: null,
 
-      searchStr: '',
-
-      menuMode: 'horizontal'
+      searchStr: ''
     }
   },
 
@@ -182,14 +193,6 @@ export default {
     // 最小化窗口
     closeWindow () {
       ipc.send('close')
-    },
-
-    changeMenuMode () {
-      if (document.body.clientWidth < 768) {
-        this.menuMode = 'vertical'
-      } else {
-        this.menuMode = 'horizontal'
-      }
     }
   },
 
@@ -203,17 +206,20 @@ export default {
     this.updateMenu()
     this.getAvatar()
 
-    this.changeMenuMode()
-    window.addEventListener('resize', this.changeMenuMode, false)
+    // window.addEventListener('resize', this.changeMenuMode, false)
   },
 
   destroyed () {
-    window.removeEventListener('resize', this.changeMenuMode, false)
+    // window.removeEventListener('resize', this.changeMenuMode, false)
   }
 }
 </script>
 
 <style lang="less" scoped>
+.search-button {display: none;}
+.user-small {display: none;}
+.user-large {display: inline-block;}
+
 .window-buttons {
   float: right;
   width: 30px;
@@ -243,24 +249,25 @@ export default {
 }
 
 @media screen and (max-width: 768px) {
-  .menu {
-    position: fixed;
-    top: 30px;
-    right: 0;
-    height: 350px;
-    box-shadow: 0 0 2px gray;
-  }
-
   .window-buttons {
-    position: absolute;
-    bottom: 0;
-    width: 118px;
-    letter-spacing: 5px;
+    display: none;
   }
 
   .search-bar {
-    margin-top: 10px;
-    width: 100px;
+    display: none;
+  }
+
+  .menu-item {
+    width: calc((100vw - 65px) / 5);
+  }
+
+  .search-button {display: inline-block;}
+  .user-large {display: none;}
+  .user-small {display: inline-block;}
+
+  .menu {
+    overflow: hidden;
+    width: 100vw;
   }
 }
 </style>

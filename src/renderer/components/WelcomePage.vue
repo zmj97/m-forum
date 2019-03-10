@@ -1,12 +1,14 @@
 <template>
-  <Tabs class="center">
-    <TabPane label="登录">
-      <login-panel></login-panel>
-    </TabPane>
-    <TabPane label="注册">
-      <signup-panel></signup-panel>
-    </TabPane>
-  </Tabs>
+  <div style="-webkit-app-region: drag" class="container">
+    <Tabs class="center"  style="-webkit-app-region: no-drag">
+      <TabPane label="登录" style="-webkit-app-region: no-drag">
+        <login-panel></login-panel>
+      </TabPane>
+      <TabPane label="注册" style="-webkit-app-region: no-drag">
+        <signup-panel></signup-panel>
+      </TabPane>
+    </Tabs>
+  </div>
 </template>
 
 <script>
@@ -40,6 +42,10 @@ export default {
 </script>
 
 <style lang="css" scoped>
+.container {
+  height: 100vh;
+}
+
 .center {
   position: absolute;
   width: 300px;

@@ -1,5 +1,7 @@
 <template>
   <div style="overflow: auto; background-color: #eee;">
+    <Input v-model="searchStr" @on-enter="getData" clearable suffix="ios-search" placeholder="搜索帖子、小组和Wiki..." class="search-bar" />
+
     <Tabs v-model="tabValue" style=" overflow-y: auto;">
 
       <TabPane label="帖子" name="posts">
@@ -65,6 +67,8 @@ export default {
 
   data () {
     return {
+      searchStr: '',
+
       tabValue: 'posts',
 
       // 仅保存题目和关键词语句
@@ -89,16 +93,21 @@ export default {
 
   watch: {
     '$route' () {
-      this.getPosts()
-      this.getGroups()
-      this.getWikis()
+      this.searchStr = this.$route.query.searchStr
+      this.getData()
     }
   },
 
   methods: {
+    getData () {
+      this.getPosts()
+      this.getGroups()
+      this.getWikis()
+    },
+
     // 获取帖子搜索结果数据
     getPosts () {
-      this.$http.post('/post/find/search', {'searchStr': this.$route.query.searchStr})
+      this.$http.post('/post/find/search', {'searchStr': this.searchStr})
         .then(res => {
           if (res.data === 'error') {
             this.$Message.error('数据库连接错误！')
@@ -118,7 +127,7 @@ export default {
 
     // 获取小组搜索结果数据
     getGroups () {
-      this.$http.post('/group/find/search', {'searchStr': this.$route.query.searchStr})
+      this.$http.post('/group/find/search', {'searchStr': this.searchStr})
         .then(res => {
           if (res.data === 'error') {
             this.$Message.error('数据库连接错误！')
@@ -134,7 +143,7 @@ export default {
 
     // 获取wiki搜索结果数据
     getWikis () {
-      this.$http.post('/wiki/find/search', {'searchStr': this.$route.query.searchStr})
+      this.$http.post('/wiki/find/search', {'searchStr': this.searchStr})
         .then(res => {
           if (res.data === 'error') {
             this.$Message.error('数据库连接错误！')
@@ -209,14 +218,21 @@ export default {
   },
 
   mounted () {
-    this.getPosts()
-    this.getGroups()
-    this.getWikis()
+    if (this.$route.query.searchStr) {
+      this.searchStr = this.$route.query.searchStr
+      this.getData()
+    }
   }
 }
 </script>
 
 <style lang="less" scoped>
+.search-bar {
+  width: 80%;
+  margin: 20px;
+  transform: translateX(10%);
+}
+
 .card-panel { margin: 1rem; }
 
 .cell-panel {
@@ -231,6 +247,10 @@ export default {
   &:hover {
     box-shadow: 0 0 1px gray;
   }
+}
+
+@media screen and (min-width: 768px) {
+  .search-bar {display: none;}
 }
 
 @media screen and (min-width: 800px) {

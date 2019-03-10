@@ -2,6 +2,8 @@
 
 const UserModel = require('../models/user')
 const PostModel = require('../models/post')
+const config = require('../../config/index')
+const fs = require('fs')
 const bodyParser = require('body-parser')
 
 class Post {
@@ -10,11 +12,26 @@ class Post {
     this.getAll = this.getAll.bind(this)
     this.getLimit = this.getLimit.bind(this)
     this.searchByStr = this.searchByStr.bind(this)
+		this.deleteReply = this.deleteReply.bind(this)
+    this.deleteById = this.deleteById.bind(this)
   }
 
   /*
    * funcs
    */
+
+	deleteImgs (content) {
+		const pattern = new RegExp('!\\[.*?\\]\\(.*?' + config.ip + '.*?\\)', 'g')
+		const imgs = content.match(pattern)
+		if (!imgs) return
+		const skipStr = '](http://120.79.144.82/statics/'
+    for (let i = 0; i < imgs.length; i++) {
+      fs.unlink('./public/' + imgs[i].slice(imgs[i].indexOf('](http') + skipStr.length, -1), function (err, data) {
+        if (err) console.log(err)
+      })
+    }
+
+	}
 
   async getPostsByPage (json, page) {
     let data, count
@@ -31,8 +48,8 @@ class Post {
 
   async searchPosts (searchStr) {
     let searchResult = []
-    const posts = PostModel.find().sort({"lastModifyTime":-1})
-    data.forEach(item => {
+    const posts = await PostModel.find().sort({"lastModifyTime":-1})
+    posts.forEach(item => {
       if (item.title.indexOf(searchStr) !== -1
        || item.abstract.indexOf(searchStr) !== -1
        || item.content.indexOf(searchStr) !== -1
@@ -83,7 +100,7 @@ class Post {
         })(),
 
         // 更新最新修改时间
-        PostModel.findByIdAndUpdate(req.body.id, {$set: {'lastModifyTime': req.body.reply.time}}),
+        PostModel.findByIdAndUpdate(req.body._id, {$set: {'lastModifyTime': req.body.reply.time}}),
 
         (async () => {
           // 被回复用户是否有新回复设为true
@@ -214,9 +231,11 @@ class Post {
       unsetJson[key] = 1
       let pullJson = {}
       pullJson[arrayName] = null
+			const post = await PostModel.findById(req.body._id)
       await PostModel.findByIdAndUpdate(req.body._id, {$unset: unsetJson})
       await PostModel.findByIdAndUpdate(req.body._id, {$pull: pullJson})
-      return res.send('success')
+      this.deleteImgs(post['replys'][req.body.index]['content'])
+			return res.send('success')
     } catch (err) {
       console.error('deleteReply() Failed:', err)
       return res.send('error')
@@ -240,10 +259,12 @@ class Post {
   // 删除帖子，使用id辨别
   async deleteById (req, res) {
     try {
+			const post = await PostModel.findById(req.body._id)
       await Promise.all([
         PostModel.findByIdAndDelete(req.body._id),
         UserModel.updateMany({}, {$pull: {stars: {id: req.body._id}}})
-      ])
+			])
+			this.deleteImgs(post.content)
       return res.send('success')
     } catch (err) {
       console.error('deleteById() Failed:', err)
