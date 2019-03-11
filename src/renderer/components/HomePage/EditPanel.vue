@@ -6,9 +6,10 @@
      class="avatar"
     ></m-avatar>
 
-    <Button class="change-button" @click="clickChangeButton">修改头像</Button>
+    <Button class="change-button" @click="showCropper = true">修改头像</Button>
 
-    <input id="inputFile" type="file" @change="inputImg" style="display: none" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg">
+    <!-- <input id="inputFile" type="file" @change="inputImg" style="display: none" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg"> -->
+    <avatar-cropper v-model="showCropper" @ok="inputImg"></avatar-cropper>
 
     <Form :model="formItem" :label-width="80" id="edit-form">
       <FormItem label="用户名">
@@ -46,7 +47,9 @@ export default {
   data () {
     return {
       username: this.getCurrentUser().username,
-      img: null,
+
+      showCropper: false,
+
       formItem: {
         avatar: null,
         email: '',
@@ -59,46 +62,35 @@ export default {
   inject: ['reload'],
 
   methods: {
-    inputImg (e) {
-      this.img = e.target.files[0]
-      this.formItem.avatar = 'file://' + this.img.path
+    inputImg (data) {
+      this.$http.post('/statics/upload-avatar', {
+        'username': this.username,
+        '_name': this.username + '.png',
+        'miniurl': data
+      }).then(res => {
+        this.formItem.avatar = res.data
+        this.submitChange()
+      }).catch(err => {
+        console.error(err)
+        this.$Message.error('修改头像失败！')
+      })
     },
 
     clickChangeButton () {
       document.getElementById('inputFile').click()
     },
 
-    uploadFormData () {
+    submitChange () {
       this.$http.post('/user/update/info', {'username': this.username, 'formdata': this.formItem})
         .then(res => {
           if (res.data === 'success') {
-            this.$Message.success('修改成功')
             this.$router.push('/home/user/' + this.username)
-            this.reload()
+            location.reload()
+            alert('修改成功')
           } else {
             this.$Message.error('修改失败')
           }
         })
-    },
-
-    submitChange () {
-      if (this.img) {
-        let reader = new FileReader()
-        reader.readAsDataURL(this.img)
-        reader.onload = e => {
-          // 获取图片数据， 保存在e.target.result中
-          this.$http.post('/statics/upload-avatar', {
-            'username': this.username,
-            '_name': this.img.name,
-            'miniurl': e.target.result
-          }).then(res => {
-            this.formItem.avatar = res.data
-            this.uploadFormData()
-          })
-        }
-      } else {
-        this.uploadFormData()
-      }
     }
   },
 

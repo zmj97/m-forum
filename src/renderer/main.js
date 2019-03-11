@@ -12,6 +12,7 @@ import mavonEditor from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
 
 import mathjaxToolbar from 'mathjax-toolbar'
+import avatarCropper from 'avatar-cropper'
 
 // 注册所有全局组件
 import commons from './components/Common/commons.js'
@@ -23,6 +24,7 @@ Vue.use(commons)
 Vue.use(mathjaxToolbar)
 Vue.use(iView)
 Vue.use(mavonEditor)
+Vue.use(avatarCropper)
 
 // 修改全局axios默认值
 axios.defaults.baseURL = 'http://120.79.144.82'

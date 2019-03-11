@@ -32,8 +32,8 @@
           </Modal>
 
           <!-- 组长可以修改小组头像 -->
-          <Button style="padding: 1px 3px; margin-left: 1rem" type="info" @click="changeAvatar()">修改头像</Button>
-          <input id="inputFile" type="file" @change="inputImg" style="display: none" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg">
+          <Button style="padding: 1px 3px; margin-left: 1rem" type="info" @click="showCropper = true">修改头像</Button>
+          <avatar-cropper v-model="showCropper" @ok="inputImg"></avatar-cropper>
         </div>
 
         <!-- 加入小组按钮，用户未加入此小组时显示 -->
@@ -156,8 +156,6 @@ export default {
       avatars: [],
       posts: [],
 
-      img: null,
-
       // 所有帖子数
       postsCount: 0,
 
@@ -172,7 +170,12 @@ export default {
       modalJoin: false,
 
       // 添加的组员的用户名
-      memberUsername: ''
+      memberUsername: '',
+
+      // 是否显示修改头像弹窗
+      showChangeAvatar: false,
+
+      showCropper: false
     }
   },
 
@@ -195,32 +198,23 @@ export default {
     },
 
     // 组长可以修改头像
-    changeAvatar () {
-      document.getElementById('inputFile').click()
-    },
-
-    inputImg (e) {
-      this.img = e.target.files[0]
-      let reader = new FileReader()
-      reader.readAsDataURL(this.img)
-      reader.onload = e => {
-        this.$http.post('/statics/upload-avatar', {
-          'name': this.name,
-          '_name': this.img.name,
-          'miniurl': e.target.result
-        }).then(res => {
-          this.$http.post('/group/update/avatar', {'name': this.name, 'avatar': res.data})
-            .then(res => {
-              if (res.data === 'success') {
-                this.$Message.success('修改成功')
-                this.$router.push('/home/group/' + this.name)
-                location.reload()
-              } else {
-                this.$Message.error('修改失败')
-              }
-            })
-        })
-      }
+    inputImg (data) {
+      this.$http.post('/statics/upload-avatar', {
+        'name': this.name,
+        '_name': this.name + '.png',
+        'miniurl': data
+      }).then(res => {
+        this.$http.post('/group/update/avatar', {'name': this.name, 'avatar': res.data})
+          .then(res => {
+            if (res.data === 'success') {
+              this.$Message.success('修改成功')
+              this.$router.push('/home/group/' + this.name)
+              location.reload()
+            } else {
+              this.$Message.error('修改失败')
+            }
+          })
+      })
     },
 
     // 用户申请加入小组

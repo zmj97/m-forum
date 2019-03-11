@@ -4,6 +4,10 @@
 >
 > 帖子有三类：公共帖子、小组内可见的帖子、部分人可见的帖子
 
+[预览demo](http://120.79.144.82/#/home/home)
+
+[web版链接](https://github.com/zmj97/m-forum-web)
+
 #### Build Setup
 
 ``` bash
@@ -197,12 +201,5 @@ This project was generated with [electron-vue](https://github.com/SimulatedGREG/
 
 测试用账号密码：
 
-123	123@qq.com		111111
-
-111	111@qq.com		111111
-
-222	222@qq.com		222222
-
-
-server2 测试用密码：
-user1	111@qq.com	111111
+zmj 111111
+zm 111111
