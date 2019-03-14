@@ -52,42 +52,21 @@ export default {
   padding: 0;
 }
 
-/* 手机中 nav 在下方显示 */
+#layout {
+  overflow: hidden;
+}
+
 #nav {
-  position: fixed;
-  bottom: 0;
-  box-shadow: 0 0 2px 1px gray;
-  text-align: center;
-  z-index: 3000;
+  display: block;
+  position: relative;
+  margin-bottom: 5px;
+  box-shadow: 0 0 10px black;
+  z-index: auto;
 }
 
 #panel {
   position: relative;
-  height: 100vh;
-  // overflow: hidden;
-}
-/*
- * -- 平板及以上设备 --
- * 上 nav 下 router-view
- */
-@media screen and (min-width: 768px) {
-  /* 设置背景色 */
-  #layout {
-    position: relative;
-    /* background-color: #bbb; */
-  }
-
-  /* 平板以上 显示 nav */
-  #nav {
-    display: block;
-    position: relative;
-    margin-bottom: 5px;
-    box-shadow: 0 0 10px black;
-    z-index: auto;
-  }
-
-  #panel {
-    height: calc(100vh - 70px);
-  }
+  height: calc(100vh - 70px);
+  overflow: auto;
 }
 </style>

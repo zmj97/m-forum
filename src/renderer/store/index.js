@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import { createPersistedState } from 'vuex-electron'
+// import { createPersistedState } from 'vuex-electron'
 
 import modules from './modules'
 
@@ -10,7 +10,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   modules,
   plugins: [
-    createPersistedState()
+    // createPersistedState()
     // createSharedMutations()
     // bug,需要在electron 主进程的index.js中手动导入store
   ],

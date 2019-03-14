@@ -28,7 +28,7 @@ function createWindow () {
     minHeight: 400,
     // 无边框
     frame: false,
-    icon: __static + '/icons/256x256.png',
+    icon: __static + '/icon.png',
     webPreferences: {
       // 关闭不可读取本地资源的限制
       webSecurity: false

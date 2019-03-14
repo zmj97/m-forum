@@ -4,7 +4,8 @@
     <Menu mode="horizontal" :active-name="menuActive" class="menu">
 
       <!-- 窗口选项： 关闭、最大化、最小化 -->
-      <div class="window-buttons" style="-webkit-app-region: no-drag">
+      <!-- 在web端不支持，因此增加是否为web判断 -->
+      <div v-if="NOT_WEB" class="window-buttons" style="-webkit-app-region: no-drag">
         <!-- 关闭窗口 -->
         <Icon
          class="window-button"
@@ -116,7 +117,8 @@
 </template>
 
 <script>
-const {ipcRenderer: ipc} = require('electron')
+let ipc
+if (!process.env.IS_WEB) ipc = require('electron').ipcRenderer
 
 export default {
 
@@ -133,7 +135,9 @@ export default {
       username: this.$store.state.Users.currentUser.username,
       avatar: null,
 
-      searchStr: ''
+      searchStr: '',
+
+      NOT_WEB: !process.env.IS_WEB
     }
   },
 
@@ -162,7 +166,11 @@ export default {
       } else if (path.indexOf('wiki') !== -1) {
         this.menuActive = '4'
       } else if (path.indexOf('user') !== -1 || path.indexOf('edit') !== -1 || path.indexOf('notifications') !== -1 || path.indexOf('star') !== -1) {
-        this.menuActive = '6'
+        if (document.body.clientWidth >= 768) {
+          this.menuActive = '6'
+        } else {
+          this.menuActive = '0'
+        }
       } else {
         this.menuActive = '-1'
       }
@@ -205,12 +213,6 @@ export default {
     // 刷新时仍保持原菜单高亮状态
     this.updateMenu()
     this.getAvatar()
-
-    // window.addEventListener('resize', this.changeMenuMode, false)
-  },
-
-  destroyed () {
-    // window.removeEventListener('resize', this.changeMenuMode, false)
   }
 }
 </script>
@@ -244,6 +246,7 @@ export default {
 }
 
 .search-bar {
+  margin-left: 1rem;
   width: calc(100vw - 550px - 5rem);
   max-width: 500px;
 }

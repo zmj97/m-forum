@@ -42,6 +42,7 @@
      v-model="wikiData.lastestVersion.content"
      :ishljs="true"
      :scrollStyle="true"
+     :autofocus="false"
      ref=md @imgAdd="$imgAdd" @imgDel="$imgDel"
     />
 

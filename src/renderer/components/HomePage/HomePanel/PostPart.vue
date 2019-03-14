@@ -78,40 +78,28 @@
     <transition name="fade">
       <div v-if="showFixMenu" id="fix-menu">
         <!-- 回到顶部 -->
-        <Tooltip content="回到顶部">
-          <a href="#detail">
-            <Icon type="ios-arrow-up" />
-          </a>
-        </Tooltip>
+        <a @click="backTop">
+          <Icon type="ios-arrow-up" />
+        </a>
 
         <!-- 收藏 -->
         <!-- 如果已收藏，显示实心星星 -->
-        <Tooltip v-if="stared" content="取消收藏">
-          <!-- 点击取消收藏 -->
-          <Icon @click="unstarPost" type="md-star" style="cursor: pointer" />
-        </Tooltip>
+        <!-- 点击取消收藏 -->
+        <Icon v-if="stared" @click="unstarPost" type="md-star" style="cursor: pointer" />
         <!-- 如果未收藏，显示空心星星 -->
-        <Tooltip v-else content="收藏">
-          <!-- 点击收藏 -->
-          <Icon @click="starPost" type="md-star-outline" style="cursor: pointer" />
-        </Tooltip>
+        <!-- 点击收藏 -->
+        <Icon v-else @click="starPost" type="md-star-outline" style="cursor: pointer" />
 
         <!-- 回复 -->
-        <Tooltip content="回复">
-          <a href="#new-reply">
-            <Icon type="ios-text" />
-          </a>
-        </Tooltip>
+        <a href="#new-reply">
+          <Icon type="ios-text" />
+        </a>
 
         <!-- 删除帖子 -->
-        <Tooltip v-if="currentUser === postDataFinal.username" content="删除帖子">
-          <Icon @click="modalDelete = true" type="md-trash" style="cursor: pointer; color: #ed4014" />
-        </Tooltip>
+        <Icon v-if="currentUser === postDataFinal.username" @click="modalDelete = true" type="md-trash" style="cursor: pointer; color: #ed4014" />
 
         <!-- 返回前一页 -->
-        <Tooltip v-if="showBack" content="返回">
-          <Icon @click="goBack" type="md-arrow-back" style="cursor: pointer" />
-        </Tooltip>
+        <Icon v-if="showBack" @click="goBack" type="md-arrow-back" style="cursor: pointer" />
       </div>
     </transition>
 
@@ -232,6 +220,35 @@ export default {
       })
     },
 
+    // 返回帖子顶部
+    backTop () {
+      const time = 10
+      let topPos, moveItem
+      topPos = 0
+
+      if (this.$route.query.postId) {
+        // 帖子页面滚动panel
+        moveItem = document.getElementById('panel')
+      } else if (this.$route.path !== '/home/home') {
+        // 个人、小组页面的帖子弹窗滚动post
+        moveItem = document.getElementsByClassName('post')[0]
+      } else if (document.body.clientWidth < 768) {
+        topPos = document.getElementById('list').scrollHeight
+        moveItem = document.getElementById('panel')
+      } else {
+        // 主页面滚动main
+        moveItem = document.getElementById('main')
+      }
+      const speed = (topPos - moveItem.scrollTop) / time
+
+      const backTopTimer = setInterval(() => {
+        moveItem.scrollTop += speed
+        if (Math.abs(moveItem.scrollTop - topPos) <= Math.abs(speed / 2)) {
+          clearInterval(backTopTimer)
+        }
+      }, 20)
+    },
+
     // 收藏帖子
     starPost () {
       this.$http.post('/user/create/star', {
@@ -312,7 +329,7 @@ export default {
     // 确保在低宽度中固定菜单在帖子列表中不显示
     scrollListener () {
       if (document.body.clientWidth > 768 || !document.getElementById('list')) return
-      let postPosition = (document.documentElement.scrollTop || document.body.scrollTop) - document.getElementById('list').scrollHeight + 300
+      let postPosition = document.getElementById('panel').scrollTop - document.getElementById('list').scrollHeight + 300
       if (this.showFixMenu && postPosition < 0) {
         this.showFixMenu = false
       } else if (!this.showFixMenu && postPosition > 0) {
@@ -323,7 +340,7 @@ export default {
       if (document.body.clientWidth > 768) {
         this.showFixMenu = true
       } else if (this.$route.query.postId === undefined) {
-        this.showFixMenu = false
+        this.scrollListener()
       }
     }
   },
@@ -381,15 +398,19 @@ export default {
       this.getStars()
     }
 
+    this.scrollListener()
+
     // 添加滚动和改变大小的监听，
     // 保证窄屏时固定按钮不会在帖子列表中显示
-    window.addEventListener('scroll', this.scrollListener, false)
+    window.addEventListener('mousewheel', this.scrollListener, false)
+    window.addEventListener('touchmove', this.scrollListener, false)
     window.addEventListener('resize', this.resizeListener, false)
   },
 
   destroyed () {
     // 销毁时移除监听器
-    window.removeEventListener('scroll', this.scrollListener, false)
+    window.removeEventListener('mousewheel', this.scrollListener, false)
+    window.removeEventListener('touchmove', this.scrollListener, false)
     window.removeEventListener('resize', this.resizeListener, false)
   }
 }

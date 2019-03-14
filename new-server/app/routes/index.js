@@ -15,18 +15,18 @@ const router = app => {
   app.use('/statics', static)
 
   app.get('*', function (req, res) {
-    const indexPath = './dist/index.html'
-    /*
-    fs.readFile(indexPath, function (err, data) {
+		if (req.path === '/') {
+			const indexPath = './web/index.html'
+			res.sendFile(path.resolve(indexPath))
+		} else {
+    fs.readFile('/home/front/server/web' + req.path, function (err, data) {
       if (err) {
-        console.log('404: index.html')
         return res.send('404')
       } else {
         return res.send(data)
       }
     })
-    */
-    res.sendFile(path.resolve(indexPath))
+    }
   })
 }
 

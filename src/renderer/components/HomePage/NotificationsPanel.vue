@@ -1,5 +1,5 @@
 <template>
-  <Tabs v-model="tabValue" style="background-color: #eee; overflow-y: auto;">
+  <Tabs v-model="tabValue" style="background-color: #eee; overflow-x: hidden; overflow-y: auto;">
     <TabPane :label="labelApply" name="apply">
       <div v-if="applyNotifications.length > 0">
         <div style="text-align: center">

@@ -109,11 +109,13 @@
         <!-- 分页 选择页数 每页显示20条 -->
         <Page v-if="postsCount > 20" :total="postsCount" :page-size="20" simple class="pageSelector" @on-change="updatePosts" />
       </div>
-      <div v-else-if="isInGroup()" style="margin-top: 5px">
-        该小组内还没有发过帖子！
-      </div>
-      <div v-else style="margin-top: 5px">
-        无权查看该小组的发帖情况！
+      <div style="margin: 5px; padding: 5px;">
+        <span v-show="isInGroup()">
+          该小组内还没有发过帖子！
+        </span>
+        <span v-if="!isInGroup()">
+          无权查看该小组的发帖情况！
+        </span>
       </div>
     </Col>
 
@@ -343,9 +345,14 @@ export default {
       this.avatar = data.avatar
       // 获取用户头像并更新
       this.getUserData(this.users, data => {
-        data.forEach(item => {
-          this.avatars.push(item.avatar)
-        })
+        for (let i = 0; i < this.users.length; i++) {
+          for (let j = 0; j < data.length; j++) {
+            if (this.users[i] === data[j].username) {
+              this.avatars.push(data[j].avatar)
+              break
+            }
+          }
+        }
       })
       // 如果用户在这个小组中
       if (this.isInGroup()) {

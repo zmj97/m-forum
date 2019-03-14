@@ -9,7 +9,6 @@
 
     <!-- ishljs 为 是否开启代码高亮 -->
     <!-- 支持mathjax -->
-    <!-- 作者停止更新，无法关闭autofocus -->
     <!-- 默认z-index过大，调整为500， 在全屏时再修改z-index -->
     <mavon-editor
      id="md-editor"

@@ -8,7 +8,6 @@
 
     <Button class="change-button" @click="showCropper = true">修改头像</Button>
 
-    <!-- <input id="inputFile" type="file" @change="inputImg" style="display: none" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg"> -->
     <avatar-cropper v-model="showCropper" @ok="inputImg"></avatar-cropper>
 
     <Form :model="formItem" :label-width="80" id="edit-form">
@@ -33,7 +32,7 @@
 
       <FormItem style="text-align: center">
         <Button type="primary" @click="submitChange">提交</Button>
-        <Button style="margin-left: 1rem">取消</Button>
+        <Button style="margin-left: 1rem" @click="cancel">取消</Button>
       </FormItem>
     </Form>
   </div>
@@ -91,6 +90,10 @@ export default {
             this.$Message.error('修改失败')
           }
         })
+    },
+
+    cancel () {
+      this.$router.go(-1)
     }
   },
 

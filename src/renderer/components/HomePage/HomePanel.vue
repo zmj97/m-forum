@@ -82,7 +82,7 @@ export default {
     jumpToPost () {
       if (document.body.clientWidth > 768) return
       let listHeight = document.getElementById('list').scrollHeight
-      document.documentElement.scrollTop = listHeight
+      document.getElementById('panel').scrollTop = listHeight
     }
   },
 

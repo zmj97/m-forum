@@ -43,12 +43,12 @@
           <span class="versions-hint" @click="showAllVersions = !showAllVersions">{{ page.allVersions.length }} 个版本</span>
 
           <!-- 具有权限的人才可进行的操作 -->
-          <span>
-             · <a @click="toEditPage">[编辑]</a>
+          <div>
+             <a @click="toEditPage">[编辑]</a>
              · <a class="delete-page" @click="modalDelete = true">[删除]</a>
              · <a class="change-authority" @click="showModifyGroups = !showModifyGroups">[修改权限]</a>
              · <router-link to="/home/new-wiki" class="new-page">[新建]</router-link>
-          </span>
+          </div>
 
           <!-- 删除确认弹窗 -->
           <Modal

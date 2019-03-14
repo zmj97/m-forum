@@ -28,7 +28,7 @@
     </Col>
 
     <!-- 选项链接 -->
-    <div style="padding: 20px; text-align: center; letter-spacing: 1px;" class="hideInPc">
+    <div v-if="currentUser === username" style="padding: 20px; text-align: center; letter-spacing: 1px;" class="hideInPc">
       <span>
         <router-link to="/home/star">
           我的收藏

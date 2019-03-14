@@ -5,7 +5,8 @@
 </template>
 
 <script>
-const shell = require('electron').shell
+let shell
+if (!process.env.IS_WEB) shell = require('electron').shell
 
 export default {
   name: 'm-forum',
@@ -33,19 +34,22 @@ export default {
   },
 
   mounted () {
-    // 使用本地默认打开软件打开链接、文件、文件夹等
-    window.addEventListener('click', function (event) {
-      const link = event.path.find($el => {
-        if ($el.tagName === 'A' && $el.href.indexOf('http://localhost') === -1 && ($el.href.startsWith('http') || $el.href.startsWith('file'))) {
-          return true
+    if (!process.env.IS_WEB) {
+      // 非web,应用端
+      // 使用本地默认打开软件打开链接、文件、文件夹等
+      window.addEventListener('click', function (event) {
+        const link = event.path.find($el => {
+          if ($el.tagName === 'A' && $el.href.indexOf('http://localhost') === -1 && ($el.href.startsWith('http') || $el.href.startsWith('file'))) {
+            return true
+          }
+          return false
+        })
+        if (link) {
+          event.preventDefault()
+          shell.openExternal(link.href)
         }
-        return false
       })
-      if (link) {
-        event.preventDefault()
-        shell.openExternal(link.href)
-      }
-    })
+    }
   }
 }
 </script>

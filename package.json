@@ -13,6 +13,7 @@
     "win32": "node .electron-vue/build.js && electron-builder --win --ia32",
     "win64": "node .electron-vue/build.js && electron-builder --win --x64",
     "mac": "node .electron-vue/build.js && electron-builder --mac ",
+    "linux": "node .electron-vue/build.js && electron-builder --linux ",
     "dev": "node .electron-vue/dev-runner.js",
     "lint": "eslint --ext .js,.vue -f ./node_modules/eslint-friendly-formatter src",
     "lint:fix": "eslint --ext .js,.vue -f ./node_modules/eslint-friendly-formatter --fix src",
@@ -56,7 +57,7 @@
     }
   },
   "dependencies": {
-    "avatar-cropper": "^1.0.5",
+    "avatar-cropper": "^1.0.6",
     "axios": "^0.18.0",
     "iview": "^3.3.0",
     "less": "^3.9.0",
@@ -66,8 +67,7 @@
     "vue": "^2.5.16",
     "vue-electron": "^1.0.6",
     "vue-router": "^3.0.1",
-    "vuex": "^3.0.1",
-    "vuex-electron": "^1.0.0"
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
     "ajv": "^6.5.0",

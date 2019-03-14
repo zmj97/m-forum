@@ -88,6 +88,7 @@ export default {
 }
 
 .left {
+  display: none;
   position: fixed;
   top: 50%;
   margin-top: -1.5rem;
@@ -95,6 +96,7 @@ export default {
 }
 
 .right {
+  display: none;
   position: fixed;
   top: 50%;
   margin-top: -1.5rem;
