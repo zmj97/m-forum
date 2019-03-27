@@ -122,6 +122,8 @@ export default {
   data () {
     return {
       currentUser: this.$store.state.Users.currentUser.username,
+      // 登录用户加入的小组
+      joinedGroups: [],
       userData: {},
       groups: [],
       posts: [],
@@ -156,12 +158,16 @@ export default {
       this.showPost = false
     },
 
-    updateData (page) {
-      this.getUserPosts(this.username, page, data => {
-        this.posts = data.data
-        this.postsCount = data.count
+    // 用户是否加入了限定的group
+    inGroup (group) {
+      // 无限定小组时任何用户可查看
+      if (!group) return true
+      return this.joinedGroups.some(function (item) {
+        return group === item
       })
+    },
 
+    updateData (page) {
       this.getUserData(this.username, data => {
         this.userData = data
         // 获取小组数据
@@ -169,12 +175,23 @@ export default {
           this.getGroupData(data.groups, groupsData => {
             this.groups.push(...groupsData)
           })
+          // 获取登录用户可查看的帖子数据
+          this.getUserPosts(this.username, page, data => {
+            for (let i = 0; i < data.data.length; i++) {
+              if (this.inGroup(data.data[i].group)) {
+                this.posts.push(data.data[i])
+              }
+            }
+            // this.posts = data.data
+            this.postsCount = this.posts.count
+          })
         }
       })
     }
   },
 
   mounted () {
+    this.getJoinedGroupsNames(this.getCurrentUser().username, this.joinedGroups)
     this.updateData(1)
   }
 }

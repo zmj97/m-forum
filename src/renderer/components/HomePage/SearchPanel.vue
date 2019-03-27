@@ -87,7 +87,10 @@ export default {
       groups: [],
 
       // 搜索到的wiki数据
-      wikis: []
+      wikis: [],
+
+      // 当前用户加入的小组
+      joinedGroups: []
     }
   },
 
@@ -99,6 +102,15 @@ export default {
   },
 
   methods: {
+    // 用户是否加入了限定的group
+    inGroup (group) {
+      // 无限定小组时任何用户可查看
+      if (!group) return true
+      return this.joinedGroups.some(function (item) {
+        return group === item
+      })
+    },
+
     getData () {
       this.getPosts()
       this.getGroups()
@@ -112,9 +124,13 @@ export default {
           if (res.data === 'error') {
             this.$Message.error('数据库连接错误！')
           } else {
-            this.postsData = res.data
+            for (let i = 0; i < res.data.length; i++) {
+              if (this.inGroup(res.data[i].group)) {
+                this.postsData.push(res.data[i])
+              }
+            }
             this.posts = []
-            res.data.forEach(item => {
+            this.postsData.forEach(item => {
               this.posts.push({'title': item.title, 'highlight': this.highlightSearchStr(item)})
             })
           }
@@ -218,6 +234,7 @@ export default {
   },
 
   mounted () {
+    this.getJoinedGroupsNames(this.getCurrentUser().username, this.joinedGroups)
     if (this.$route.query.searchStr) {
       this.searchStr = this.$route.query.searchStr
       this.getData()

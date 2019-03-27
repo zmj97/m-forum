@@ -35,12 +35,15 @@ npm run lint
 
 ```
 
+
+
+#### 部署
+
+`pm2`
+
 ---
 
 This project was generated with [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[8fae476](https://github.com/SimulatedGREG/electron-vue/tree/8fae4763e9d225d3691b627e83b9e09b56f6c935) using [vue-cli](https://github.com/vuejs/vue-cli). Documentation about the original structure can be found [here](https://simulatedgreg.gitbooks.io/electron-vue/content/index.html).
-
-
-[webhook push event](https://developer.github.com/v3/activity/events/types/#webhook-event-name-34)
 
 
 
@@ -166,12 +169,12 @@ server.js
   - /delete
     - /reply
     - /reply-to-reply
-    - *
+    - `*`
 - /group
   - /create
     - /member
     - /join
-    - *
+    - `*`
   - /find
     - `get` /names
     - `get` *
@@ -184,7 +187,7 @@ server.js
     - /avatar
   - /delete
     - /member
-    - *
+    - `*`
 - /wiki
   - /create
     - /new
@@ -197,12 +200,12 @@ server.js
     - /groups
     - /hooks
   - /delete
-    - *
+    - `*`
 - /statics
   - `get` *
   - /upload
   - /upload-avatar
-- *
+- `*`
   - 返回`web/`内对应文件
   - 没有返回404
 

@@ -138,6 +138,8 @@ export default {
       avatar: null,
       // 当前用户
       currentUser: this.$store.state.Users.currentUser.username,
+      // 当前用户加入的小组
+      joinedGroups: [],
       // 删除帖子的弹窗是否显示
       modalDelete: false,
       // 最终用于显示的帖子数据
@@ -195,6 +197,15 @@ export default {
   },
 
   methods: {
+    // 用户是否加入了限定的group
+    inGroup (group) {
+      // 无限定小组时任何用户可查看
+      if (!group) return true
+      return this.joinedGroups.some(function (item) {
+        return group === item
+      })
+    },
+
     // 获取发布人的头像
     getAvatar () {
       this.getUserData(this.postDataFinal.username, data => {
@@ -365,6 +376,8 @@ export default {
     } else if (this.$route.query.postId !== undefined) {
       // 利用query传递帖子id
       this.showBack = true
+      // 获取当前用户加入的小组
+      this.getJoinedGroupsNames(this.getCurrentUser().username, this.joinedGroups)
       this.$http.post('/post/find/byId', {'_id': [this.$route.query.postId]})
         .then(res => {
           if (res.data === 'empty') {
@@ -373,6 +386,10 @@ export default {
             this.$Message.error('数据库连接错误!')
             this.$router.push('/home')
           } else {
+            if (!this.inGroup(res.data[0].group)) {
+              this.$Message.error('无权查看！')
+              this.$router.push('/home')
+            }
             this.postDataFinal = res.data[0]
             this.getAvatar()
             this.getStars()
