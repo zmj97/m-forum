@@ -9,6 +9,7 @@ const BabiliWebpackPlugin = require('babili-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CompressionPlugin = require("compression-webpack-plugin")
 const { VueLoaderPlugin } = require('vue-loader')
 
 let webConfig = {
@@ -95,6 +96,18 @@ let webConfig = {
         removeComments: true
       },
       nodeModules: false
+    }),
+    new CompressionPlugin({
+      filename: '[path].gz[query]',
+      algorithm: 'gzip',
+      test: new RegExp(
+        '\\.(' +
+        'js|css' +
+        ')$'
+      ),
+      threshold: 10240,
+      // deleteOriginalAssets:true, //删除源文件
+      minRatio: 0.8
     }),
     new webpack.DefinePlugin({
       'process.env.IS_WEB': 'true'

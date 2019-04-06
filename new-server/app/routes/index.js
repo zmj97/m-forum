@@ -17,15 +17,19 @@ const router = app => {
   app.get('*', function (req, res) {
 		if (req.path === '/') {
 			const indexPath = './web/index.html'
-			res.sendFile(path.resolve(indexPath))
+			return res.sendFile(path.resolve(indexPath))
+		} else if (req.path === '/web.js') {
+			res.header('Content-Encoding', 'gzip')
+			res.header('Content-Type', "application/javascript; charset=utf-8")
+			return res.sendFile(path.resolve('./web/web.js.gz'))
 		} else {
-    fs.readFile('/home/front/server/web' + req.path, function (err, data) {
-      if (err) {
-        return res.send('404')
-      } else {
-        return res.send(data)
-      }
-    })
+    	fs.readFile('/home/front/server/web' + req.path, function (err, data) {
+      	if (err) {
+					return res.send('404')
+				} else {
+        	return res.send(data)
+      	}
+    	})
     }
   })
 }

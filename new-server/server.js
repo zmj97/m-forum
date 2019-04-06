@@ -4,8 +4,13 @@ const mongoose = require('mongoose')
 const router = require('./app/routes/index')
 const config = require('./config')
 const express = require('express')
+const compression = require('compression')
 
 const app = express()
+
+// gzip
+app.use(compression())
+
 // 添加允许跨域头信息
 app.all('*', function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*")

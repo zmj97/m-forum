@@ -9,6 +9,7 @@
   "author": "zmj97",
   "license": "MIT",
   "dependencies": {
+    "compression": "^1.7.4",
     "express": "^4.16.4",
     "md5-node": "^1.0.1",
     "mongoose": "^5.4.17"
