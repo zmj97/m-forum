@@ -75,11 +75,11 @@
                style="width: auto;"
               >
                 <Option
-                 v-for="group in allGroups"
-                 :value="group.name"
-                 :key="group.name"
+                 v-for="group in joinedGroups"
+                 :value="group"
+                 :key="group"
                 >
-                  {{ group.name }}
+                  {{ group }}
                 </Option>
               </Select>
 
@@ -135,7 +135,7 @@ export default {
       // 修改权限小组存储
       groups: [],
       // 所有小组
-      allGroups: [],
+      // allGroups: [],
       // 用户加入的小组
       joinedGroups: [],
 
@@ -274,7 +274,7 @@ export default {
   mounted () {
     this.getJoinedGroupsNames(this.getCurrentUser().username, this.joinedGroups)
     setTimeout(() => { this.getTitles() }, 10)
-    this.getAllGroupsNames(this.allGroups)
+    // this.getAllGroupsNames(this.allGroups)
   }
 }
 </script>

@@ -24,10 +24,10 @@
       >
         <Option
          v-for="group in allGroups"
-         :value="group.name"
-         :key="group.name"
+         :value="group"
+         :key="group"
         >
-          {{ group.name }}
+          {{ group }}
         </Option>
       </Select>
     </section>
@@ -202,7 +202,8 @@ export default {
       this.wikiData.title = this.$route.query.title
       this.wikiData.lastestVersion.content = this.$route.query.content
     } else {
-      this.getAllGroupsNames(this.allGroups)
+      // 限制的小组只能为用户已加入的小组
+      this.getJoinedGroupsNames(this.getCurrentUser().username, this.allGroups)
     }
   }
 }
