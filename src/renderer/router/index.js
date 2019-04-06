@@ -14,12 +14,13 @@ const router = new Router({
       // 登录注册界面
       path: '/welcome',
       name: 'welcome-page',
-      component: require('@/components/WelcomePage').default
+      // vue组件懒加载
+      component: resolve => require(['@/components/WelcomePage'], resolve)
     },
     {
       // 主页
       path: '/home',
-      component: require('@/components/HomePage').default,
+      component: resolve => require(['@/components/HomePage'], resolve),
       children: [
         {
           path: '',
@@ -27,51 +28,51 @@ const router = new Router({
         },
         {
           path: 'home',
-          component: require('@/components/HomePage/HomePanel').default
+          component: resolve => require(['@/components/HomePage/HomePanel'], resolve)
         },
         {
           path: 'groups',
-          component: require('@/components/HomePage/GroupsPanel').default
+          component: resolve => require(['@/components/HomePage/GroupsPanel'], resolve)
         },
         {
           path: 'group/:name',
-          component: require('@/components/HomePage/GroupPanel').default
+          component: resolve => require(['@/components/HomePage/GroupPanel'], resolve)
         },
         {
           path: 'new-post',
-          component: require('@/components/HomePage/NewPostPanel').default
+          component: resolve => require(['@/components/HomePage/NewPostPanel'], resolve)
         },
         {
           path: 'user/:name',
-          component: require('@/components/HomePage/UserPanel').default
+          component: resolve => require(['@/components/HomePage/UserPanel'], resolve)
         },
         {
           path: 'edit',
-          component: require('@/components/HomePage/EditPanel').default
+          component: resolve => require(['@/components/HomePage/EditPanel'], resolve)
         },
         {
           path: 'wiki',
-          component: require('@/components/HomePage/WikiPanel').default
+          component: resolve => require(['@/components/HomePage/WikiPanel'], resolve)
         },
         {
           path: 'new-wiki',
-          component: require('@/components/HomePage/WikiPanel/NewPage').default
+          component: resolve => require(['@/components/HomePage/WikiPanel/NewPage'], resolve)
         },
         {
           path: 'notifications',
-          component: require('@/components/HomePage/NotificationsPanel').default
+          component: resolve => require(['@/components/HomePage/NotificationsPanel'], resolve)
         },
         {
           path: 'post',
-          component: require('@/components/HomePage/HomePanel/PostPart').default
+          component: resolve => require(['@/components/HomePage/HomePanel/PostPart'], resolve)
         },
         {
           path: 'search',
-          component: require('@/components/HomePage/SearchPanel').default
+          component: resolve => require(['@/components/HomePage/SearchPanel'], resolve)
         },
         {
           path: 'star',
-          component: require('@/components/HomePage/StarPanel').default
+          component: resolve => require(['@/components/HomePage/StarPanel'], resolve)
         }
       ]
     },
