@@ -57,7 +57,7 @@
     }
   },
   "dependencies": {
-    "avatar-cropper": "^1.0.6",
+    "avatar-cropper": "^1.0.8",
     "axios": "^0.18.0",
     "iview": "^3.3.0",
     "less": "^3.9.0",
