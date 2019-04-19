@@ -15,7 +15,8 @@
       <Modal
         v-model="modalCancel"
         title="放弃发布"
-        :zIndex=5000>
+        :zIndex=5000
+        @on-ok="okCancel">
         <p>确定要放弃发布这篇帖子么？您将丢失您编辑的所有内容！</p>
       </Modal>
 
@@ -162,6 +163,10 @@ export default {
 
     $imgDel (pos) {
       delete this.imgFiles[pos]
+    },
+
+    okCancel () {
+      this.$router.push('/home')
     },
 
     async okPost () {

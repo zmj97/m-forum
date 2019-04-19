@@ -110,7 +110,7 @@
         <Page v-if="postsCount > 20" :total="postsCount" :page-size="20" simple class="pageSelector" @on-change="updatePosts" />
       </div>
       <div style="margin: 5px; padding: 5px;">
-        <span v-show="isInGroup()">
+        <span v-show="isInGroup() && posts.length == 0">
           该小组内还没有发过帖子！
         </span>
         <span v-if="!isInGroup()">
