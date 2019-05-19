@@ -1,3 +1,4 @@
+import Vue from 'vue'
 const key = 'username'
 
 const state = {
@@ -7,11 +8,11 @@ const state = {
 const mutations = {
   SAVE_STORAGE (state, payload) {
     state.username = payload.username
-    localStorage.setItem(key, payload.username)
+    Vue.prototype.$cookie.set(key, payload.username, 30)
   },
   DEL_STORAGE (state) {
     state.username = null
-    localStorage.removeItem(key)
+    Vue.prototype.$cookie.delete(key)
   }
 }
 

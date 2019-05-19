@@ -7,3 +7,5 @@ npm-debug.log
 npm-debug.log.*
 thumbs.db
 !.gitkeep
+dist/web.zip
+dist/web.tar.xz

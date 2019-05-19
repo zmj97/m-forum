@@ -84,10 +84,10 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
-  if (window.localStorage.username) {
+  if (Vue.prototype.$cookie.get('username')) {
     if (store.state.Users.currentUser.username === '') {
       store.dispatch('setUser', {
-        username: window.localStorage.username
+        username: Vue.prototype.$cookie.get('username')
       })
     }
     next()

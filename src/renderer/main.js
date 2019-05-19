@@ -18,6 +18,7 @@ import avatarCropper from 'avatar-cropper'
 import commons from './components/Common/commons.js'
 // 引入所有全局函数
 import methods from './assets/methods.js'
+import VueCookie from 'vue-cookie'
 
 Vue.use(methods)
 Vue.use(commons)
@@ -25,6 +26,7 @@ Vue.use(mathjaxToolbar)
 Vue.use(iView)
 Vue.use(mavonEditor)
 Vue.use(avatarCropper)
+Vue.use(VueCookie)
 
 // 修改全局axios默认值
 axios.defaults.baseURL = 'http://120.79.144.82'
